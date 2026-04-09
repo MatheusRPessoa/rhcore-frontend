@@ -22,15 +22,15 @@ export interface AuthTokens {
 }
 
 export interface User {
-  ID: number;
+  ID: string;
   USERNAME: string;
   STATUS: "ATIVO" | "INATIVO";
-  CREATED_AT: string;
-  UPDATED_AT: string;
+  CRIADO_EM: string;
+  ATUALIZADO_POR?: string | null;
 }
 
 export interface Employee {
-  ID: number;
+  ID: string;
   MATRICULA: string;
   NOME: string;
   CPF: string;
@@ -39,12 +39,12 @@ export interface Employee {
   EMAIL: string;
   TELEFONE?: string;
   DATA_ADMISSAO: string;
-  DEPARTAMENTO_ID?: number;
-  CARGO_ID?: number;
-  GESTOR_ID?: number;
+  DEPARTAMENTO_ID?: string;
+  CARGO_ID?: string;
+  GESTOR_ID?: string;
   STATUS: "ATIVO" | "INATIVO";
-  CREATED_AT: string;
-  UPDATED_AT: string;
+  CRIADO_EM: string;
+  ATUALIZADO_POR?: string | null;
   DEPARTAMENTO?: Department;
   CARGO?: Position;
   GESTOR?: Employee;
@@ -59,9 +59,9 @@ export interface CreateEmployeeData {
   EMAIL: string;
   TELEFONE?: string;
   DATA_ADMISSAO: string;
-  DEPARTAMENTO_ID?: number;
-  CARGO_ID?: number;
-  GESTOR_ID?: number;
+  DEPARTAMENTO_ID?: string;
+  CARGO_ID?: string;
+  GESTOR_ID?: string;
 }
 
 export interface UpdateEmployeeData extends Partial<CreateEmployeeData> {
@@ -93,12 +93,12 @@ export interface UpdateDepartmentData extends Partial<CreateDepartmentData> {
 }
 
 export interface Position {
-  ID: number;
+  ID: string;
   NOME: string;
   DESCRICAO?: string;
   STATUS: "ATIVO" | "INATIVO";
-  CREATED_AT: string;
-  UPDATED_AT: string;
+  CRIADO_EM: string;
+  ATUALIZADO_POR?: string | null;
 }
 
 export interface CreatePositionData {
@@ -117,23 +117,23 @@ export type VacationStatus =
   | "CANCELADO";
 
 export interface Vacation {
-  ID: number;
-  FUNCIONARIO_ID: number;
+  ID: string;
+  FUNCIONARIO_ID: string;
   DATA_INICIO: string;
   DATA_FIM: string;
   DIAS_SOLICITADOS: number;
   STATUS_FERIAS: VacationStatus;
-  APROVADO_POR_ID?: number;
+  APROVADO_POR_ID?: string;
   DATA_APROVACAO?: string;
   OBSERVACAO?: string;
-  CREATED_AT: string;
-  UPDATED_AT: string;
+  CRIADO_EM: string;
+  ATUALIZADO_POR?: string | null;
   FUNCIONARIO?: Employee;
   APROVADO_POR?: Employee;
 }
 
 export interface CreateVacationData {
-  FUNCIONARIO_ID: number;
+  FUNCIONARIO_ID: string;
   DATA_INICIO: string;
   DATA_FIM: string;
   OBSERVACAO?: string;
@@ -141,7 +141,7 @@ export interface CreateVacationData {
 
 export interface UpdateVacationData extends Partial<CreateVacationData> {
   STATUS_FERIAS?: VacationStatus;
-  APROVADO_POR_ID?: number;
+  APROVADO_POR_ID?: string;
   DATA_APROVACAO?: string;
 }
 
@@ -153,22 +153,22 @@ export type RequestType =
   | "OUTROS";
 
 export interface HRRequest {
-  ID: number;
-  FUNCIONARIO_ID: number;
+  ID: string;
+  FUNCIONARIO_ID: string;
   TIPO: RequestType;
   DESCRICAO: string;
   DATA_SOLICITACAO: string;
   DATA_RESPOSTA?: string;
-  APROVADO_POR_ID?: number;
+  APROVADO_POR_ID?: string;
   OBSERVACAO?: string;
-  CREATED_AT: string;
-  UPDATED_AT: string;
+  CRIADO_EM: string;
+  ATUALIZADO_POR?: string | null;
   FUNCIONARIO?: Employee;
   APROVADO_POR?: Employee;
 }
 
 export interface CreateRequestData {
-  FUNCIONARIO_ID: number;
+  FUNCIONARIO_ID: string;
   TIPO: RequestType;
   DESCRICAO: string;
   DATA_SOLICITACAO: string;
@@ -177,15 +177,15 @@ export interface CreateRequestData {
 
 export interface UpdateRequestData extends Partial<CreateRequestData> {
   DATA_RESPOSTA?: string;
-  APROVADO_POR_ID?: number;
+  APROVADO_POR_ID?: string;
 }
 
 export interface SystemUser {
-  ID: number;
+  ID: string;
   USERNAME: string;
   STATUS: "ATIVO" | "INATIVO";
-  CREATED_AT: string;
-  UPDATED_AT: string;
+  CRIADO_EM: string;
+  ATUALIZADO_POR?: string | null;
 }
 
 export interface CreateUserData {

@@ -146,7 +146,7 @@ export const employeesApi = {
     return apiRequest<ApiResponse<Employee[]>>("/employees");
   },
 
-  getById: async (id: number): Promise<ApiResponse<Employee>> => {
+  getById: async (id: string): Promise<ApiResponse<Employee>> => {
     return apiRequest<ApiResponse<Employee>>(`/employees/${id}`);
   },
 
@@ -158,7 +158,7 @@ export const employeesApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: UpdateEmployeeData,
   ): Promise<ApiResponse<Employee>> => {
     return apiRequest<ApiResponse<Employee>>(`/employees/${id}`, {
@@ -167,7 +167,7 @@ export const employeesApi = {
     });
   },
 
-  delete: async (id: number): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/employees/${id}`, {
       method: "DELETE",
     });
@@ -180,7 +180,7 @@ export const departmentsApi = {
     return apiRequest<ApiResponse<Department[]>>("/departments");
   },
 
-  getById: async (id: number): Promise<ApiResponse<Department>> => {
+  getById: async (id: string): Promise<ApiResponse<Department>> => {
     return apiRequest<ApiResponse<Department>>(`/departments/${id}`);
   },
 
@@ -194,7 +194,7 @@ export const departmentsApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: UpdateDepartmentData,
   ): Promise<ApiResponse<Department>> => {
     return apiRequest<ApiResponse<Department>>(`/departments/${id}`, {
@@ -203,7 +203,7 @@ export const departmentsApi = {
     });
   },
 
-  delete: async (id: number): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/departments/${id}`, {
       method: "DELETE",
     });
@@ -216,7 +216,7 @@ export const positionsApi = {
     return apiRequest<ApiResponse<Position[]>>("/positions");
   },
 
-  getById: async (id: number): Promise<ApiResponse<Position>> => {
+  getById: async (id: string): Promise<ApiResponse<Position>> => {
     return apiRequest<ApiResponse<Position>>(`/positions/${id}`);
   },
 
@@ -228,7 +228,7 @@ export const positionsApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: UpdatePositionData,
   ): Promise<ApiResponse<Position>> => {
     return apiRequest<ApiResponse<Position>>(`/positions/${id}`, {
@@ -237,7 +237,7 @@ export const positionsApi = {
     });
   },
 
-  delete: async (id: number): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/positions/${id}`, {
       method: "DELETE",
     });
@@ -250,7 +250,7 @@ export const vacationsApi = {
     return apiRequest<ApiResponse<Vacation[]>>("/vacations");
   },
 
-  getById: async (id: number): Promise<ApiResponse<Vacation>> => {
+  getById: async (id: string): Promise<ApiResponse<Vacation>> => {
     return apiRequest<ApiResponse<Vacation>>(`/vacations/${id}`);
   },
 
@@ -262,7 +262,7 @@ export const vacationsApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: UpdateVacationData,
   ): Promise<ApiResponse<Vacation>> => {
     return apiRequest<ApiResponse<Vacation>>(`/vacations/${id}`, {
@@ -271,7 +271,7 @@ export const vacationsApi = {
     });
   },
 
-  delete: async (id: number): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/vacations/${id}`, {
       method: "DELETE",
     });
@@ -284,7 +284,7 @@ export const requestsApi = {
     return apiRequest<ApiResponse<HRRequest[]>>("/requests");
   },
 
-  getById: async (id: number): Promise<ApiResponse<HRRequest>> => {
+  getById: async (id: string): Promise<ApiResponse<HRRequest>> => {
     return apiRequest<ApiResponse<HRRequest>>(`/requests/${id}`);
   },
 
@@ -296,7 +296,7 @@ export const requestsApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: UpdateRequestData,
   ): Promise<ApiResponse<HRRequest>> => {
     return apiRequest<ApiResponse<HRRequest>>(`/requests/${id}`, {
@@ -305,7 +305,7 @@ export const requestsApi = {
     });
   },
 
-  delete: async (id: number): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/requests/${id}`, {
       method: "DELETE",
     });
@@ -318,7 +318,7 @@ export const usersApi = {
     return apiRequest<ApiResponse<SystemUser[]>>("/users");
   },
 
-  getById: async (id: number): Promise<ApiResponse<SystemUser>> => {
+  getById: async (id: string): Promise<ApiResponse<SystemUser>> => {
     return apiRequest<ApiResponse<SystemUser>>(`/users/${id}`);
   },
 
@@ -330,7 +330,7 @@ export const usersApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: UpdateUserData,
   ): Promise<ApiResponse<SystemUser>> => {
     return apiRequest<ApiResponse<SystemUser>>(`/users/${id}`, {
@@ -339,7 +339,7 @@ export const usersApi = {
     });
   },
 
-  delete: async (id: number): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/users/${id}`, {
       method: "DELETE",
     });
