@@ -1,56 +1,74 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useQuery } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Field, FieldGroup, FieldLabel, FieldMessage } from "@/components/ui/field"
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldMessage,
+} from "@/components/ui/field";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import { employeesApi } from "@/lib/api"
-import type { Vacation, CreateVacationData, UpdateVacationData, VacationStatus } from "@/lib/types"
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { employeesApi } from "@/lib/api";
+import type {
+  Vacation,
+  CreateVacationData,
+  UpdateVacationData,
+  VacationStatus,
+} from "@/lib/types";
 
 const vacationSchema = z.object({
   FUNCIONARIO_ID: z.string().min(1, "Funcionário é obrigatório"),
   DATA_INICIO: z.string().min(1, "Data de início é obrigatória"),
   DATA_FIM: z.string().min(1, "Data de fim é obrigatória"),
   OBSERVACAO: z.string().max(500, "Máximo de 500 caracteres").optional(),
-  STATUS_FERIAS: z.enum(["PENDENTE", "APROVADO", "REJEITADO", "CANCELADO"]).optional(),
+  STATUS_FERIAS: z
+    .enum(["PENDENTE", "APROVADO", "REJEITADO", "CANCELADO"])
+    .optional(),
   APROVADO_POR_ID: z.string().optional(),
   DATA_APROVACAO: z.string().optional(),
-})
+});
 
-type VacationFormData = z.infer<typeof vacationSchema>
+type VacationFormData = z.infer<typeof vacationSchema>;
 
 interface VacationFormProps {
-  vacation?: Vacation
-  onSubmit: (data: CreateVacationData | UpdateVacationData) => Promise<void>
-  isSubmitting: boolean
-  onCancel: () => void
+  vacation?: Vacation;
+  onSubmit: (data: CreateVacationData | UpdateVacationData) => Promise<void>;
+  isSubmitting: boolean;
+  onCancel: () => void;
 }
 
-export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: VacationFormProps) {
+export function VacationForm({
+  vacation,
+  onSubmit,
+  isSubmitting,
+  onCancel,
+}: VacationFormProps) {
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: () => employeesApi.getAll(),
-  })
+  });
 
-  const employees = employeesData?.data?.filter(e => e.STATUS === "ATIVO") || []
+  const employees =
+    employeesData?.data?.filter((e) => e.STATUS === "ATIVO") || [];
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<VacationFormData>({
     resolver: zodResolver(vacationSchema),
@@ -63,29 +81,33 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
       APROVADO_POR_ID: vacation?.APROVADO_POR_ID?.toString() || "",
       DATA_APROVACAO: vacation?.DATA_APROVACAO?.split("T")[0] || "",
     },
-  })
+  });
+
+  const funcionarioId = useWatch({ control, name: "FUNCIONARIO_ID" });
+  const statusFerias = useWatch({ control, name: "STATUS_FERIAS" });
+  const aprovadoPorId = useWatch({ control, name: "APROVADO_POR_ID" });
 
   const handleFormSubmit = async (data: VacationFormData) => {
     const payload: CreateVacationData | UpdateVacationData = {
-      FUNCIONARIO_ID: Number(data.FUNCIONARIO_ID),
+      FUNCIONARIO_ID: data.FUNCIONARIO_ID,
       DATA_INICIO: data.DATA_INICIO,
       DATA_FIM: data.DATA_FIM,
       OBSERVACAO: data.OBSERVACAO || undefined,
-    }
+    };
 
     if (vacation) {
-      const updatePayload = payload as UpdateVacationData
-      updatePayload.STATUS_FERIAS = data.STATUS_FERIAS as VacationStatus
+      const updatePayload = payload as UpdateVacationData;
+      updatePayload.STATUS_FERIAS = data.STATUS_FERIAS as VacationStatus;
       if (data.APROVADO_POR_ID) {
-        updatePayload.APROVADO_POR_ID = Number(data.APROVADO_POR_ID)
+        updatePayload.APROVADO_POR_ID = data.APROVADO_POR_ID;
       }
       if (data.DATA_APROVACAO) {
-        updatePayload.DATA_APROVACAO = data.DATA_APROVACAO
+        updatePayload.DATA_APROVACAO = data.DATA_APROVACAO;
       }
     }
 
-    await onSubmit(payload)
-  }
+    await onSubmit(payload);
+  };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -93,7 +115,7 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
         <Field>
           <FieldLabel>Funcionário *</FieldLabel>
           <Select
-            value={watch("FUNCIONARIO_ID")}
+            value={funcionarioId}
             onValueChange={(value) => setValue("FUNCIONARIO_ID", value)}
           >
             <SelectTrigger>
@@ -107,20 +129,32 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
               ))}
             </SelectContent>
           </Select>
-          {errors.FUNCIONARIO_ID && <FieldMessage variant="error">{errors.FUNCIONARIO_ID.message}</FieldMessage>}
+          {errors.FUNCIONARIO_ID && (
+            <FieldMessage variant="error">
+              {errors.FUNCIONARIO_ID.message}
+            </FieldMessage>
+          )}
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <FieldLabel htmlFor="DATA_INICIO">Data de Início *</FieldLabel>
             <Input id="DATA_INICIO" type="date" {...register("DATA_INICIO")} />
-            {errors.DATA_INICIO && <FieldMessage variant="error">{errors.DATA_INICIO.message}</FieldMessage>}
+            {errors.DATA_INICIO && (
+              <FieldMessage variant="error">
+                {errors.DATA_INICIO.message}
+              </FieldMessage>
+            )}
           </Field>
 
           <Field>
             <FieldLabel htmlFor="DATA_FIM">Data de Fim *</FieldLabel>
             <Input id="DATA_FIM" type="date" {...register("DATA_FIM")} />
-            {errors.DATA_FIM && <FieldMessage variant="error">{errors.DATA_FIM.message}</FieldMessage>}
+            {errors.DATA_FIM && (
+              <FieldMessage variant="error">
+                {errors.DATA_FIM.message}
+              </FieldMessage>
+            )}
           </Field>
         </div>
 
@@ -133,7 +167,11 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
             maxLength={500}
             placeholder="Máximo de 500 caracteres"
           />
-          {errors.OBSERVACAO && <FieldMessage variant="error">{errors.OBSERVACAO.message}</FieldMessage>}
+          {errors.OBSERVACAO && (
+            <FieldMessage variant="error">
+              {errors.OBSERVACAO.message}
+            </FieldMessage>
+          )}
         </Field>
 
         {vacation && (
@@ -141,8 +179,10 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
             <Field>
               <FieldLabel>Status</FieldLabel>
               <Select
-                value={watch("STATUS_FERIAS")}
-                onValueChange={(value) => setValue("STATUS_FERIAS", value as VacationStatus)}
+                value={statusFerias}
+                onValueChange={(value) =>
+                  setValue("STATUS_FERIAS", value as VacationStatus)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -159,7 +199,7 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
             <Field>
               <FieldLabel>Aprovado Por</FieldLabel>
               <Select
-                value={watch("APROVADO_POR_ID")}
+                value={aprovadoPorId}
                 onValueChange={(value) => setValue("APROVADO_POR_ID", value)}
               >
                 <SelectTrigger>
@@ -176,8 +216,14 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="DATA_APROVACAO">Data de Aprovação</FieldLabel>
-              <Input id="DATA_APROVACAO" type="date" {...register("DATA_APROVACAO")} />
+              <FieldLabel htmlFor="DATA_APROVACAO">
+                Data de Aprovação
+              </FieldLabel>
+              <Input
+                id="DATA_APROVACAO"
+                type="date"
+                {...register("DATA_APROVACAO")}
+              />
             </Field>
           </>
         )}
@@ -193,5 +239,5 @@ export function VacationForm({ vacation, onSubmit, isSubmitting, onCancel }: Vac
         </div>
       </FieldGroup>
     </form>
-  )
+  );
 }

@@ -1,43 +1,57 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Field, FieldGroup, FieldLabel, FieldMessage } from "@/components/ui/field"
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldMessage,
+} from "@/components/ui/field";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import type { Position, CreatePositionData, UpdatePositionData } from "@/lib/types"
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import type {
+  Position,
+  CreatePositionData,
+  UpdatePositionData,
+} from "@/lib/types";
 
 const positionSchema = z.object({
   NOME: z.string().min(1, "Nome é obrigatório"),
   DESCRICAO: z.string().optional(),
   STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
-})
+});
 
-type PositionFormData = z.infer<typeof positionSchema>
+type PositionFormData = z.infer<typeof positionSchema>;
 
 interface PositionFormProps {
-  position?: Position
-  onSubmit: (data: CreatePositionData | UpdatePositionData) => Promise<void>
-  isSubmitting: boolean
-  onCancel: () => void
+  position?: Position;
+  onSubmit: (data: CreatePositionData | UpdatePositionData) => Promise<void>;
+  isSubmitting: boolean;
+  onCancel: () => void;
 }
 
-export function PositionForm({ position, onSubmit, isSubmitting, onCancel }: PositionFormProps) {
+export function PositionForm({
+  position,
+  onSubmit,
+  isSubmitting,
+  onCancel,
+}: PositionFormProps) {
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<PositionFormData>({
     resolver: zodResolver(positionSchema),
@@ -46,20 +60,22 @@ export function PositionForm({ position, onSubmit, isSubmitting, onCancel }: Pos
       DESCRICAO: position?.DESCRICAO || "",
       STATUS: position?.STATUS || "ATIVO",
     },
-  })
+  });
+
+  const status = useWatch({ control, name: "STATUS" });
 
   const handleFormSubmit = async (data: PositionFormData) => {
     const payload: CreatePositionData | UpdatePositionData = {
       NOME: data.NOME,
       DESCRICAO: data.DESCRICAO || undefined,
-    }
+    };
 
     if (position && data.STATUS) {
-      (payload as UpdatePositionData).STATUS = data.STATUS
+      (payload as UpdatePositionData).STATUS = data.STATUS;
     }
 
-    await onSubmit(payload)
-  }
+    await onSubmit(payload);
+  };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -67,7 +83,9 @@ export function PositionForm({ position, onSubmit, isSubmitting, onCancel }: Pos
         <Field>
           <FieldLabel htmlFor="NOME">Nome *</FieldLabel>
           <Input id="NOME" {...register("NOME")} />
-          {errors.NOME && <FieldMessage variant="error">{errors.NOME.message}</FieldMessage>}
+          {errors.NOME && (
+            <FieldMessage variant="error">{errors.NOME.message}</FieldMessage>
+          )}
         </Field>
 
         <Field>
@@ -79,8 +97,10 @@ export function PositionForm({ position, onSubmit, isSubmitting, onCancel }: Pos
           <Field>
             <FieldLabel>Status</FieldLabel>
             <Select
-              value={watch("STATUS")}
-              onValueChange={(value) => setValue("STATUS", value as "ATIVO" | "INATIVO")}
+              value={status}
+              onValueChange={(value) =>
+                setValue("STATUS", value as "ATIVO" | "INATIVO")
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -104,5 +124,5 @@ export function PositionForm({ position, onSubmit, isSubmitting, onCancel }: Pos
         </div>
       </FieldGroup>
     </form>
-  )
+  );
 }

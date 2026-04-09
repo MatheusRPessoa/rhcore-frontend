@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   AlertDialog,
@@ -9,19 +9,19 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Spinner } from "@/components/ui/spinner"
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ConfirmDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: string
-  description: string
-  onConfirm: () => void
-  isLoading?: boolean
-  confirmText?: string
-  cancelText?: string
-  variant?: "default" | "destructive"
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  onConfirm: () => void;
+  isLoading?: boolean;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: "default" | "destructive";
 }
 
 export function ConfirmDialog({
@@ -43,7 +43,9 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{cancelText}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>
+            {cancelText}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isLoading}
@@ -59,5 +61,5 @@ export function ConfirmDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

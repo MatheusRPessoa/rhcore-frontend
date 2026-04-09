@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FormModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: string
-  description?: string
-  children: ReactNode
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  children: ReactNode;
 }
 
 export function FormModal({
@@ -37,5 +37,5 @@ export function FormModal({
         </ScrollArea>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

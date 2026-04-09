@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -10,7 +10,7 @@ import {
   Palmtree,
   FileText,
   UserCog,
-} from "lucide-react"
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +22,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 const mainNavItems = [
   {
@@ -45,7 +45,7 @@ const mainNavItems = [
     url: "/positions",
     icon: Briefcase,
   },
-]
+];
 
 const requestNavItems = [
   {
@@ -58,7 +58,7 @@ const requestNavItems = [
     url: "/requests",
     icon: FileText,
   },
-]
+];
 
 const adminNavItems = [
   {
@@ -66,17 +66,17 @@ const adminNavItems = [
     url: "/users",
     icon: UserCog,
   },
-]
+];
 
 export function AppSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const isActive = (url: string) => {
     if (url === "/") {
-      return pathname === "/"
+      return pathname === "/";
     }
-    return pathname.startsWith(url)
-  }
+    return pathname.startsWith(url);
+  };
 
   return (
     <Sidebar>
@@ -86,7 +86,9 @@ export function AppSidebar() {
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-sidebar-foreground">RHCore</h1>
+            <h1 className="text-lg font-bold text-sidebar-foreground">
+              RHCore
+            </h1>
             <p className="text-xs text-sidebar-foreground/60">Sistema de RH</p>
           </div>
         </Link>
@@ -152,5 +154,5 @@ export function AppSidebar() {
         </p>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

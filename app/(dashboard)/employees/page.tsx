@@ -1,107 +1,120 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ColumnDef } from "@tanstack/react-table"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/data-table"
-import { PageHeader } from "@/components/page-header"
-import { StatusBadge } from "@/components/status-badge"
-import { FormModal } from "@/components/form-modal"
-import { ConfirmDialog } from "@/components/confirm-dialog"
-import { EmployeeForm } from "@/components/forms/employee-form"
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/data-table";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { FormModal } from "@/components/form-modal";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { EmployeeForm } from "@/components/forms/employee-form";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react"
-import { employeesApi } from "@/lib/api"
-import type { Employee, CreateEmployeeData, UpdateEmployeeData } from "@/lib/types"
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Plus, MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
+import { employeesApi } from "@/lib/api";
+import type {
+  Employee,
+  CreateEmployeeData,
+  UpdateEmployeeData,
+} from "@/lib/types";
 
 export default function EmployeesPage() {
-  const queryClient = useQueryClient()
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | undefined>()
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
-  const [isViewOpen, setIsViewOpen] = useState(false)
-  const [viewEmployee, setViewEmployee] = useState<Employee | null>(null)
+  const queryClient = useQueryClient();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<
+    Employee | undefined
+  >();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
+    null,
+  );
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [viewEmployee, setViewEmployee] = useState<Employee | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["employees"],
     queryFn: () => employeesApi.getAll(),
-  })
+  });
 
   const createMutation = useMutation({
     mutationFn: (data: CreateEmployeeData) => employeesApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] })
-      setIsFormOpen(false)
-      toast.success("Funcionário criado com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      setIsFormOpen(false);
+      toast.success("Funcionário criado com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao criar funcionário")
+      toast.error("Erro ao criar funcionário");
     },
-  })
+  });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateEmployeeData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateEmployeeData }) =>
       employeesApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] })
-      setIsFormOpen(false)
-      setSelectedEmployee(undefined)
-      toast.success("Funcionário atualizado com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      setIsFormOpen(false);
+      setSelectedEmployee(undefined);
+      toast.success("Funcionário atualizado com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao atualizar funcionário")
+      toast.error("Erro ao atualizar funcionário");
     },
-  })
+  });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => employeesApi.delete(id),
+    mutationFn: (id: string) => employeesApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] })
-      setIsDeleteOpen(false)
-      setEmployeeToDelete(null)
-      toast.success("Funcionário excluído com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      setIsDeleteOpen(false);
+      setEmployeeToDelete(null);
+      toast.success("Funcionário excluído com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao excluir funcionário")
+      toast.error("Erro ao excluir funcionário");
     },
-  })
+  });
 
-  const handleSubmit = async (formData: CreateEmployeeData | UpdateEmployeeData) => {
+  const handleSubmit = async (
+    formData: CreateEmployeeData | UpdateEmployeeData,
+  ) => {
     if (selectedEmployee) {
-      await updateMutation.mutateAsync({ id: selectedEmployee.ID, data: formData })
+      await updateMutation.mutateAsync({
+        id: selectedEmployee.ID,
+        data: formData,
+      });
     } else {
-      await createMutation.mutateAsync(formData as CreateEmployeeData)
+      await createMutation.mutateAsync(formData as CreateEmployeeData);
     }
-  }
+  };
 
   const openCreateForm = () => {
-    setSelectedEmployee(undefined)
-    setIsFormOpen(true)
-  }
+    setSelectedEmployee(undefined);
+    setIsFormOpen(true);
+  };
 
   const openEditForm = (employee: Employee) => {
-    setSelectedEmployee(employee)
-    setIsFormOpen(true)
-  }
+    setSelectedEmployee(employee);
+    setIsFormOpen(true);
+  };
 
   const openDeleteDialog = (employee: Employee) => {
-    setEmployeeToDelete(employee)
-    setIsDeleteOpen(true)
-  }
+    setEmployeeToDelete(employee);
+    setIsDeleteOpen(true);
+  };
 
   const openViewDialog = (employee: Employee) => {
-    setViewEmployee(employee)
-    setIsViewOpen(true)
-  }
+    setViewEmployee(employee);
+    setIsViewOpen(true);
+  };
 
   const columns: ColumnDef<Employee>[] = [
     {
@@ -143,13 +156,14 @@ export default function EmployeesPage() {
     {
       accessorKey: "DATA_ADMISSAO",
       header: "Admissão",
-      cell: ({ row }) => new Date(row.original.DATA_ADMISSAO).toLocaleDateString("pt-BR"),
+      cell: ({ row }) =>
+        new Date(row.original.DATA_ADMISSAO).toLocaleDateString("pt-BR"),
     },
     {
       id: "actions",
       header: "",
       cell: ({ row }) => {
-        const employee = row.original
+        const employee = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -176,12 +190,12 @@ export default function EmployeesPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
-  const employees = data?.data || []
+  const employees = data?.data || [];
 
   return (
     <div>
@@ -213,7 +227,11 @@ export default function EmployeesPage() {
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
         title={selectedEmployee ? "Editar Funcionário" : "Novo Funcionário"}
-        description={selectedEmployee ? "Atualize os dados do funcionário" : "Preencha os dados do novo funcionário"}
+        description={
+          selectedEmployee
+            ? "Atualize os dados do funcionário"
+            : "Preencha os dados do novo funcionário"
+        }
       >
         <EmployeeForm
           employee={selectedEmployee}
@@ -266,18 +284,32 @@ export default function EmployeesPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Data de Nascimento</p>
-                <p className="font-medium">{new Date(viewEmployee.DATA_NASCIMENTO).toLocaleDateString("pt-BR")}</p>
+                <p className="text-sm text-muted-foreground">
+                  Data de Nascimento
+                </p>
+                <p className="font-medium">
+                  {new Date(viewEmployee.DATA_NASCIMENTO).toLocaleDateString(
+                    "pt-BR",
+                  )}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Data de Admissão</p>
-                <p className="font-medium">{new Date(viewEmployee.DATA_ADMISSAO).toLocaleDateString("pt-BR")}</p>
+                <p className="text-sm text-muted-foreground">
+                  Data de Admissão
+                </p>
+                <p className="font-medium">
+                  {new Date(viewEmployee.DATA_ADMISSAO).toLocaleDateString(
+                    "pt-BR",
+                  )}
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Departamento</p>
-                <p className="font-medium">{viewEmployee.DEPARTAMENTO?.NOME || "-"}</p>
+                <p className="font-medium">
+                  {viewEmployee.DEPARTAMENTO?.NOME || "-"}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Cargo</p>
@@ -302,10 +334,12 @@ export default function EmployeesPage() {
         onOpenChange={setIsDeleteOpen}
         title="Excluir Funcionário"
         description={`Tem certeza que deseja excluir o funcionário "${employeeToDelete?.NOME}"? Esta ação não pode ser desfeita.`}
-        onConfirm={() => employeeToDelete && deleteMutation.mutate(employeeToDelete.ID)}
+        onConfirm={() =>
+          employeeToDelete && deleteMutation.mutate(employeeToDelete.ID)
+        }
         isLoading={deleteMutation.isPending}
         confirmText="Excluir"
       />
     </div>
-  )
+  );
 }

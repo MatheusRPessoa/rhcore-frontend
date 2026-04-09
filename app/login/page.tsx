@@ -1,28 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useAuth } from "@/contexts/auth-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field"
-import { Spinner } from "@/components/ui/spinner"
-import { Building2, LogIn } from "lucide-react"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+} from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { Building2, LogIn } from "lucide-react";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Usuário é obrigatório"),
   password: z.string().min(1, "Senha é obrigatória"),
-})
+});
 
-type LoginFormData = z.infer<typeof loginSchema>
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { login } = useAuth()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { login } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -30,23 +41,24 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-  })
+  });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsSubmitting(true)
-    setError(null)
+    setIsSubmitting(true);
+    setError(null);
 
     try {
-      await login(data)
+      await login(data);
     } catch (err: unknown) {
-      const errorMessage = err && typeof err === "object" && "message" in err
-        ? (err as { message: string }).message
-        : "Erro ao fazer login"
-      setError(errorMessage)
+      const errorMessage =
+        err && typeof err === "object" && "message" in err
+          ? (err as { message: string }).message
+          : "Erro ao fazer login";
+      setError(errorMessage);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -58,7 +70,9 @@ export default function LoginPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">RHCore</CardTitle>
-          <CardDescription>Sistema de Gestão de Recursos Humanos</CardDescription>
+          <CardDescription>
+            Sistema de Gestão de Recursos Humanos
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -110,5 +124,5 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

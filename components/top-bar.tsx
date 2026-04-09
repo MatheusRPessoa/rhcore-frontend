@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/contexts/auth-context"
-import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,17 +9,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { LogOut, User } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { LogOut, User } from "lucide-react";
 
 export function TopBar() {
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth();
 
   const initials = user?.USERNAME
     ? user.USERNAME.slice(0, 2).toUpperCase()
-    : "US"
+    : "US";
 
   return (
     <header className="flex items-center justify-between h-16 px-4 border-b bg-card">
@@ -59,5 +59,5 @@ export function TopBar() {
         </DropdownMenu>
       </div>
     </header>
-  )
+  );
 }

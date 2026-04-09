@@ -1,100 +1,113 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ColumnDef } from "@tanstack/react-table"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/data-table"
-import { PageHeader } from "@/components/page-header"
-import { StatusBadge } from "@/components/status-badge"
-import { FormModal } from "@/components/form-modal"
-import { ConfirmDialog } from "@/components/confirm-dialog"
-import { VacationForm } from "@/components/forms/vacation-form"
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/data-table";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { FormModal } from "@/components/form-modal";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { VacationForm } from "@/components/forms/vacation-form";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
-import { vacationsApi } from "@/lib/api"
-import type { Vacation, CreateVacationData, UpdateVacationData } from "@/lib/types"
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { vacationsApi } from "@/lib/api";
+import type {
+  Vacation,
+  CreateVacationData,
+  UpdateVacationData,
+} from "@/lib/types";
 
 export default function VacationsPage() {
-  const queryClient = useQueryClient()
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [selectedVacation, setSelectedVacation] = useState<Vacation | undefined>()
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [vacationToDelete, setVacationToDelete] = useState<Vacation | null>(null)
+  const queryClient = useQueryClient();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedVacation, setSelectedVacation] = useState<
+    Vacation | undefined
+  >();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [vacationToDelete, setVacationToDelete] = useState<Vacation | null>(
+    null,
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ["vacations"],
     queryFn: () => vacationsApi.getAll(),
-  })
+  });
 
   const createMutation = useMutation({
     mutationFn: (data: CreateVacationData) => vacationsApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vacations"] })
-      setIsFormOpen(false)
-      toast.success("Férias registradas com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["vacations"] });
+      setIsFormOpen(false);
+      toast.success("Férias registradas com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao registrar férias")
+      toast.error("Erro ao registrar férias");
     },
-  })
+  });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateVacationData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateVacationData }) =>
       vacationsApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vacations"] })
-      setIsFormOpen(false)
-      setSelectedVacation(undefined)
-      toast.success("Férias atualizadas com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["vacations"] });
+      setIsFormOpen(false);
+      setSelectedVacation(undefined);
+      toast.success("Férias atualizadas com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao atualizar férias")
+      toast.error("Erro ao atualizar férias");
     },
-  })
+  });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => vacationsApi.delete(id),
+    mutationFn: (id: string) => vacationsApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vacations"] })
-      setIsDeleteOpen(false)
-      setVacationToDelete(null)
-      toast.success("Férias excluídas com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["vacations"] });
+      setIsDeleteOpen(false);
+      setVacationToDelete(null);
+      toast.success("Férias excluídas com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao excluir férias")
+      toast.error("Erro ao excluir férias");
     },
-  })
+  });
 
-  const handleSubmit = async (formData: CreateVacationData | UpdateVacationData) => {
+  const handleSubmit = async (
+    formData: CreateVacationData | UpdateVacationData,
+  ) => {
     if (selectedVacation) {
-      await updateMutation.mutateAsync({ id: selectedVacation.ID, data: formData })
+      await updateMutation.mutateAsync({
+        id: selectedVacation.ID,
+        data: formData,
+      });
     } else {
-      await createMutation.mutateAsync(formData as CreateVacationData)
+      await createMutation.mutateAsync(formData as CreateVacationData);
     }
-  }
+  };
 
   const openCreateForm = () => {
-    setSelectedVacation(undefined)
-    setIsFormOpen(true)
-  }
+    setSelectedVacation(undefined);
+    setIsFormOpen(true);
+  };
 
   const openEditForm = (vacation: Vacation) => {
-    setSelectedVacation(vacation)
-    setIsFormOpen(true)
-  }
+    setSelectedVacation(vacation);
+    setIsFormOpen(true);
+  };
 
   const openDeleteDialog = (vacation: Vacation) => {
-    setVacationToDelete(vacation)
-    setIsDeleteOpen(true)
-  }
+    setVacationToDelete(vacation);
+    setIsDeleteOpen(true);
+  };
 
   const columns: ColumnDef<Vacation>[] = [
     {
@@ -105,12 +118,14 @@ export default function VacationsPage() {
     {
       accessorKey: "DATA_INICIO",
       header: "Data Início",
-      cell: ({ row }) => new Date(row.original.DATA_INICIO).toLocaleDateString("pt-BR"),
+      cell: ({ row }) =>
+        new Date(row.original.DATA_INICIO).toLocaleDateString("pt-BR"),
     },
     {
       accessorKey: "DATA_FIM",
       header: "Data Fim",
-      cell: ({ row }) => new Date(row.original.DATA_FIM).toLocaleDateString("pt-BR"),
+      cell: ({ row }) =>
+        new Date(row.original.DATA_FIM).toLocaleDateString("pt-BR"),
     },
     {
       accessorKey: "DIAS_SOLICITADOS",
@@ -130,7 +145,7 @@ export default function VacationsPage() {
       id: "actions",
       header: "",
       cell: ({ row }) => {
-        const vacation = row.original
+        const vacation = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -153,12 +168,12 @@ export default function VacationsPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
-  const vacations = data?.data || []
+  const vacations = data?.data || [];
 
   return (
     <div>
@@ -189,8 +204,14 @@ export default function VacationsPage() {
       <FormModal
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        title={selectedVacation ? "Editar Férias" : "Nova Solicitação de Férias"}
-        description={selectedVacation ? "Atualize os dados das férias" : "Preencha os dados da solicitação"}
+        title={
+          selectedVacation ? "Editar Férias" : "Nova Solicitação de Férias"
+        }
+        description={
+          selectedVacation
+            ? "Atualize os dados das férias"
+            : "Preencha os dados da solicitação"
+        }
       >
         <VacationForm
           vacation={selectedVacation}
@@ -205,10 +226,12 @@ export default function VacationsPage() {
         onOpenChange={setIsDeleteOpen}
         title="Excluir Férias"
         description={`Tem certeza que deseja excluir esta solicitação de férias de "${vacationToDelete?.FUNCIONARIO?.NOME}"? Esta ação não pode ser desfeita.`}
-        onConfirm={() => vacationToDelete && deleteMutation.mutate(vacationToDelete.ID)}
+        onConfirm={() =>
+          vacationToDelete && deleteMutation.mutate(vacationToDelete.ID)
+        }
         isLoading={deleteMutation.isPending}
         confirmText="Excluir"
       />
     </div>
-  )
+  );
 }

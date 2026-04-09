@@ -1,29 +1,42 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useQuery } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Field, FieldGroup, FieldLabel, FieldMessage } from "@/components/ui/field"
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldMessage,
+} from "@/components/ui/field";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import { departmentsApi, positionsApi, employeesApi } from "@/lib/api"
-import type { Employee, CreateEmployeeData, UpdateEmployeeData } from "@/lib/types"
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { departmentsApi, positionsApi, employeesApi } from "@/lib/api";
+import type {
+  Employee,
+  CreateEmployeeData,
+  UpdateEmployeeData,
+} from "@/lib/types";
 
 const employeeSchema = z.object({
   MATRICULA: z.string().min(1, "Matrícula é obrigatória"),
   NOME: z.string().min(1, "Nome é obrigatório"),
-  CPF: z.string()
+  CPF: z
+    .string()
     .min(1, "CPF é obrigatório")
-    .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF deve estar no formato 000.000.000-00"),
+    .regex(
+      /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
+      "CPF deve estar no formato 000.000.000-00",
+    ),
   RG: z.string().optional(),
   DATA_NASCIMENTO: z.string().min(1, "Data de nascimento é obrigatória"),
   EMAIL: z.string().email("E-mail inválido"),
@@ -33,42 +46,52 @@ const employeeSchema = z.object({
   CARGO_ID: z.string().optional(),
   GESTOR_ID: z.string().optional(),
   STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
-})
+});
 
-type EmployeeFormData = z.infer<typeof employeeSchema>
+type EmployeeFormData = z.infer<typeof employeeSchema>;
 
 interface EmployeeFormProps {
-  employee?: Employee
-  onSubmit: (data: CreateEmployeeData | UpdateEmployeeData) => Promise<void>
-  isSubmitting: boolean
-  onCancel: () => void
+  employee?: Employee;
+  onSubmit: (data: CreateEmployeeData | UpdateEmployeeData) => Promise<void>;
+  isSubmitting: boolean;
+  onCancel: () => void;
 }
 
-export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: EmployeeFormProps) {
+export function EmployeeForm({
+  employee,
+  onSubmit,
+  isSubmitting,
+  onCancel,
+}: EmployeeFormProps) {
   const { data: departmentsData } = useQuery({
     queryKey: ["departments"],
     queryFn: () => departmentsApi.getAll(),
-  })
+  });
 
   const { data: positionsData } = useQuery({
     queryKey: ["positions"],
     queryFn: () => positionsApi.getAll(),
-  })
+  });
 
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: () => employeesApi.getAll(),
-  })
+  });
 
-  const departments = departmentsData?.data?.filter(d => d.STATUS === "ATIVO") || []
-  const positions = positionsData?.data?.filter(p => p.STATUS === "ATIVO") || []
-  const employees = employeesData?.data?.filter(e => e.STATUS === "ATIVO" && e.ID !== employee?.ID) || []
+  const departments =
+    departmentsData?.data?.filter((d) => d.STATUS === "ATIVO") || [];
+  const positions =
+    positionsData?.data?.filter((p) => p.STATUS === "ATIVO") || [];
+  const employees =
+    employeesData?.data?.filter(
+      (e) => e.STATUS === "ATIVO" && e.ID !== employee?.ID,
+    ) || [];
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
@@ -86,15 +109,22 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
       GESTOR_ID: employee?.GESTOR_ID?.toString() || "",
       STATUS: employee?.STATUS || "ATIVO",
     },
-  })
+  });
 
   const formatCPF = (value: string) => {
-    const numbers = value.replace(/\D/g, "")
-    if (numbers.length <= 3) return numbers
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`
-    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`
-  }
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6)
+      return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+    if (numbers.length <= 9)
+      return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+  };
+
+  const departamentoId = useWatch({ control, name: "DEPARTAMENTO_ID" });
+  const cargoId = useWatch({ control, name: "CARGO_ID" });
+  const gestorId = useWatch({ control, name: "GESTOR_ID" });
+  const status = useWatch({ control, name: "STATUS" });
 
   const handleFormSubmit = async (data: EmployeeFormData) => {
     const payload: CreateEmployeeData | UpdateEmployeeData = {
@@ -106,17 +136,17 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
       EMAIL: data.EMAIL,
       TELEFONE: data.TELEFONE || undefined,
       DATA_ADMISSAO: data.DATA_ADMISSAO,
-      DEPARTAMENTO_ID: data.DEPARTAMENTO_ID ? Number(data.DEPARTAMENTO_ID) : undefined,
-      CARGO_ID: data.CARGO_ID ? Number(data.CARGO_ID) : undefined,
-      GESTOR_ID: data.GESTOR_ID ? Number(data.GESTOR_ID) : undefined,
-    }
+      DEPARTAMENTO_ID: data.DEPARTAMENTO_ID || undefined,
+      CARGO_ID: data.CARGO_ID || undefined,
+      GESTOR_ID: data.GESTOR_ID || undefined,
+    };
 
     if (employee && data.STATUS) {
-      (payload as UpdateEmployeeData).STATUS = data.STATUS
+      (payload as UpdateEmployeeData).STATUS = data.STATUS;
     }
 
-    await onSubmit(payload)
-  }
+    await onSubmit(payload);
+  };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -125,7 +155,11 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
           <Field>
             <FieldLabel htmlFor="MATRICULA">Matrícula *</FieldLabel>
             <Input id="MATRICULA" {...register("MATRICULA")} />
-            {errors.MATRICULA && <FieldMessage variant="error">{errors.MATRICULA.message}</FieldMessage>}
+            {errors.MATRICULA && (
+              <FieldMessage variant="error">
+                {errors.MATRICULA.message}
+              </FieldMessage>
+            )}
           </Field>
 
           <Field>
@@ -134,20 +168,24 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
               id="CPF"
               {...register("CPF")}
               onChange={(e) => {
-                const formatted = formatCPF(e.target.value)
-                setValue("CPF", formatted)
+                const formatted = formatCPF(e.target.value);
+                setValue("CPF", formatted);
               }}
               placeholder="000.000.000-00"
               maxLength={14}
             />
-            {errors.CPF && <FieldMessage variant="error">{errors.CPF.message}</FieldMessage>}
+            {errors.CPF && (
+              <FieldMessage variant="error">{errors.CPF.message}</FieldMessage>
+            )}
           </Field>
         </div>
 
         <Field>
           <FieldLabel htmlFor="NOME">Nome Completo *</FieldLabel>
           <Input id="NOME" {...register("NOME")} />
-          {errors.NOME && <FieldMessage variant="error">{errors.NOME.message}</FieldMessage>}
+          {errors.NOME && (
+            <FieldMessage variant="error">{errors.NOME.message}</FieldMessage>
+          )}
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
@@ -157,9 +195,19 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="DATA_NASCIMENTO">Data de Nascimento *</FieldLabel>
-            <Input id="DATA_NASCIMENTO" type="date" {...register("DATA_NASCIMENTO")} />
-            {errors.DATA_NASCIMENTO && <FieldMessage variant="error">{errors.DATA_NASCIMENTO.message}</FieldMessage>}
+            <FieldLabel htmlFor="DATA_NASCIMENTO">
+              Data de Nascimento *
+            </FieldLabel>
+            <Input
+              id="DATA_NASCIMENTO"
+              type="date"
+              {...register("DATA_NASCIMENTO")}
+            />
+            {errors.DATA_NASCIMENTO && (
+              <FieldMessage variant="error">
+                {errors.DATA_NASCIMENTO.message}
+              </FieldMessage>
+            )}
           </Field>
         </div>
 
@@ -167,26 +215,42 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
           <Field>
             <FieldLabel htmlFor="EMAIL">E-mail *</FieldLabel>
             <Input id="EMAIL" type="email" {...register("EMAIL")} />
-            {errors.EMAIL && <FieldMessage variant="error">{errors.EMAIL.message}</FieldMessage>}
+            {errors.EMAIL && (
+              <FieldMessage variant="error">
+                {errors.EMAIL.message}
+              </FieldMessage>
+            )}
           </Field>
 
           <Field>
             <FieldLabel htmlFor="TELEFONE">Telefone</FieldLabel>
-            <Input id="TELEFONE" {...register("TELEFONE")} placeholder="(00) 00000-0000" />
+            <Input
+              id="TELEFONE"
+              {...register("TELEFONE")}
+              placeholder="(00) 00000-0000"
+            />
           </Field>
         </div>
 
         <Field>
           <FieldLabel htmlFor="DATA_ADMISSAO">Data de Admissão *</FieldLabel>
-          <Input id="DATA_ADMISSAO" type="date" {...register("DATA_ADMISSAO")} />
-          {errors.DATA_ADMISSAO && <FieldMessage variant="error">{errors.DATA_ADMISSAO.message}</FieldMessage>}
+          <Input
+            id="DATA_ADMISSAO"
+            type="date"
+            {...register("DATA_ADMISSAO")}
+          />
+          {errors.DATA_ADMISSAO && (
+            <FieldMessage variant="error">
+              {errors.DATA_ADMISSAO.message}
+            </FieldMessage>
+          )}
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <FieldLabel>Departamento</FieldLabel>
             <Select
-              value={watch("DEPARTAMENTO_ID")}
+              value={departamentoId}
               onValueChange={(value) => setValue("DEPARTAMENTO_ID", value)}
             >
               <SelectTrigger>
@@ -205,7 +269,7 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
           <Field>
             <FieldLabel>Cargo</FieldLabel>
             <Select
-              value={watch("CARGO_ID")}
+              value={cargoId}
               onValueChange={(value) => setValue("CARGO_ID", value)}
             >
               <SelectTrigger>
@@ -225,7 +289,7 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
         <Field>
           <FieldLabel>Gestor</FieldLabel>
           <Select
-            value={watch("GESTOR_ID")}
+            value={gestorId}
             onValueChange={(value) => setValue("GESTOR_ID", value)}
           >
             <SelectTrigger>
@@ -245,8 +309,10 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
           <Field>
             <FieldLabel>Status</FieldLabel>
             <Select
-              value={watch("STATUS")}
-              onValueChange={(value) => setValue("STATUS", value as "ATIVO" | "INATIVO")}
+              value={status}
+              onValueChange={(value) =>
+                setValue("STATUS", value as "ATIVO" | "INATIVO")
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -270,5 +336,5 @@ export function EmployeeForm({ employee, onSubmit, isSubmitting, onCancel }: Emp
         </div>
       </FieldGroup>
     </form>
-  )
+  );
 }

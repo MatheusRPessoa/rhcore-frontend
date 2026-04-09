@@ -1,100 +1,113 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ColumnDef } from "@tanstack/react-table"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/data-table"
-import { PageHeader } from "@/components/page-header"
-import { StatusBadge } from "@/components/status-badge"
-import { FormModal } from "@/components/form-modal"
-import { ConfirmDialog } from "@/components/confirm-dialog"
-import { RequestForm } from "@/components/forms/request-form"
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/data-table";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { FormModal } from "@/components/form-modal";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { RequestForm } from "@/components/forms/request-form";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
-import { requestsApi } from "@/lib/api"
-import type { HRRequest, CreateRequestData, UpdateRequestData } from "@/lib/types"
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { requestsApi } from "@/lib/api";
+import type {
+  HRRequest,
+  CreateRequestData,
+  UpdateRequestData,
+} from "@/lib/types";
 
 export default function RequestsPage() {
-  const queryClient = useQueryClient()
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [selectedRequest, setSelectedRequest] = useState<HRRequest | undefined>()
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [requestToDelete, setRequestToDelete] = useState<HRRequest | null>(null)
+  const queryClient = useQueryClient();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<
+    HRRequest | undefined
+  >();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<HRRequest | null>(
+    null,
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ["requests"],
     queryFn: () => requestsApi.getAll(),
-  })
+  });
 
   const createMutation = useMutation({
     mutationFn: (data: CreateRequestData) => requestsApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] })
-      setIsFormOpen(false)
-      toast.success("Solicitação criada com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      setIsFormOpen(false);
+      toast.success("Solicitação criada com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao criar solicitação")
+      toast.error("Erro ao criar solicitação");
     },
-  })
+  });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateRequestData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateRequestData }) =>
       requestsApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] })
-      setIsFormOpen(false)
-      setSelectedRequest(undefined)
-      toast.success("Solicitação atualizada com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      setIsFormOpen(false);
+      setSelectedRequest(undefined);
+      toast.success("Solicitação atualizada com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao atualizar solicitação")
+      toast.error("Erro ao atualizar solicitação");
     },
-  })
+  });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => requestsApi.delete(id),
+    mutationFn: (id: string) => requestsApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] })
-      setIsDeleteOpen(false)
-      setRequestToDelete(null)
-      toast.success("Solicitação excluída com sucesso!")
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      setIsDeleteOpen(false);
+      setRequestToDelete(null);
+      toast.success("Solicitação excluída com sucesso!");
     },
     onError: () => {
-      toast.error("Erro ao excluir solicitação")
+      toast.error("Erro ao excluir solicitação");
     },
-  })
+  });
 
-  const handleSubmit = async (formData: CreateRequestData | UpdateRequestData) => {
+  const handleSubmit = async (
+    formData: CreateRequestData | UpdateRequestData,
+  ) => {
     if (selectedRequest) {
-      await updateMutation.mutateAsync({ id: selectedRequest.ID, data: formData })
+      await updateMutation.mutateAsync({
+        id: selectedRequest.ID,
+        data: formData,
+      });
     } else {
-      await createMutation.mutateAsync(formData as CreateRequestData)
+      await createMutation.mutateAsync(formData as CreateRequestData);
     }
-  }
+  };
 
   const openCreateForm = () => {
-    setSelectedRequest(undefined)
-    setIsFormOpen(true)
-  }
+    setSelectedRequest(undefined);
+    setIsFormOpen(true);
+  };
 
   const openEditForm = (request: HRRequest) => {
-    setSelectedRequest(request)
-    setIsFormOpen(true)
-  }
+    setSelectedRequest(request);
+    setIsFormOpen(true);
+  };
 
   const openDeleteDialog = (request: HRRequest) => {
-    setRequestToDelete(request)
-    setIsDeleteOpen(true)
-  }
+    setRequestToDelete(request);
+    setIsDeleteOpen(true);
+  };
 
   const columns: ColumnDef<HRRequest>[] = [
     {
@@ -119,7 +132,8 @@ export default function RequestsPage() {
     {
       accessorKey: "DATA_SOLICITACAO",
       header: "Data Solicitação",
-      cell: ({ row }) => new Date(row.original.DATA_SOLICITACAO).toLocaleDateString("pt-BR"),
+      cell: ({ row }) =>
+        new Date(row.original.DATA_SOLICITACAO).toLocaleDateString("pt-BR"),
     },
     {
       accessorKey: "DATA_RESPOSTA",
@@ -138,7 +152,7 @@ export default function RequestsPage() {
       id: "actions",
       header: "",
       cell: ({ row }) => {
-        const request = row.original
+        const request = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -161,12 +175,12 @@ export default function RequestsPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
-  const requests = data?.data || []
+  const requests = data?.data || [];
 
   return (
     <div>
@@ -198,7 +212,11 @@ export default function RequestsPage() {
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
         title={selectedRequest ? "Editar Solicitação" : "Nova Solicitação"}
-        description={selectedRequest ? "Atualize os dados da solicitação" : "Preencha os dados da nova solicitação"}
+        description={
+          selectedRequest
+            ? "Atualize os dados da solicitação"
+            : "Preencha os dados da nova solicitação"
+        }
       >
         <RequestForm
           request={selectedRequest}
@@ -213,10 +231,12 @@ export default function RequestsPage() {
         onOpenChange={setIsDeleteOpen}
         title="Excluir Solicitação"
         description={`Tem certeza que deseja excluir esta solicitação de "${requestToDelete?.FUNCIONARIO?.NOME}"? Esta ação não pode ser desfeita.`}
-        onConfirm={() => requestToDelete && deleteMutation.mutate(requestToDelete.ID)}
+        onConfirm={() =>
+          requestToDelete && deleteMutation.mutate(requestToDelete.ID)
+        }
         isLoading={deleteMutation.isPending}
         confirmText="Excluir"
       />
     </div>
-  )
+  );
 }
