@@ -41,10 +41,7 @@ const departmentSchema = z.object({
     .string()
     .max(255, "Descrição deve ter no máximo 255 caracteres")
     .optional(),
-  DEPARTAMENTO_PAI_ID: z
-    .string()
-    .uuid("ID do departamento pai é inválido")
-    .optional(),
+  DEPARTAMENTO_PAI_ID: z.string().optional(),
   STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
 });
 
@@ -95,15 +92,20 @@ export function DepartmentForm({
   const departamentoPaiId = useWatch({ control, name: "DEPARTAMENTO_PAI_ID" });
   const status = useWatch({ control, name: "STATUS" });
 
-  const handleFormSubmit = async (data: DepartmentFormData) => {
+  const handleFormSubmit = async (formValues: DepartmentFormData) => {
     const payload: CreateDepartmentData | UpdateDepartmentData = {
-      NOME: data.NOME,
-      DESCRICAO: data.DESCRICAO || undefined,
-      DEPARTAMENTO_PAI_ID: data.DEPARTAMENTO_PAI_ID || undefined,
+      NOME: formValues.NOME,
+      SIGLA: formValues.SIGLA,
+      DESCRICAO: formValues.DESCRICAO || undefined,
+      DEPARTAMENTO_PAI_ID:
+        !formValues.DEPARTAMENTO_PAI_ID ||
+        formValues.DEPARTAMENTO_PAI_ID === "none"
+          ? undefined
+          : formValues.DEPARTAMENTO_PAI_ID,
     };
 
-    if (department && data.STATUS) {
-      (payload as UpdateDepartmentData).STATUS = data.STATUS;
+    if (department && formValues.STATUS) {
+      (payload as UpdateDepartmentData).STATUS = formValues.STATUS;
     }
 
     await onSubmit(payload);
