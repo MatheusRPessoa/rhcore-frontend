@@ -27,16 +27,22 @@ import type {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
-let accessToken: string | null = null;
-let refreshToken: string | null = null;
+let accessToken: string | null =
+  typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+let refreshToken: string | null =
+  typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
 
 export function setTokens(tokens: AuthTokens | null) {
   if (tokens) {
     accessToken = tokens.access_token;
     refreshToken = tokens.refresh_token;
+    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem("refresh_token", refreshToken);
   } else {
     accessToken = null;
     refreshToken = null;
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
   }
 }
 
