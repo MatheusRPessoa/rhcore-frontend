@@ -101,7 +101,7 @@ export default function UsersPage() {
 
   const columns: ColumnDef<SystemUser>[] = [
     {
-      accessorKey: "USERNAME",
+      accessorKey: "NOME_USUARIO",
       header: "Usuário",
     },
     {
@@ -170,7 +170,7 @@ export default function UsersPage() {
         <DataTable
           columns={columns}
           data={users}
-          searchKey="USERNAME"
+          searchKey="NOME_USUARIO"
           searchPlaceholder="Buscar por usuário..."
         />
       )}
@@ -197,7 +197,7 @@ export default function UsersPage() {
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
         title="Excluir Usuário"
-        description={`Tem certeza que deseja excluir o usuário "${userToDelete?.USERNAME}"? Esta ação não pode ser desfeita.`}
+        description={`Tem certeza que deseja excluir o usuário "${userToDelete?.NOME_USUARIO}"? Esta ação não pode ser desfeita.`}
         onConfirm={() => userToDelete && deleteMutation.mutate(userToDelete.ID)}
         isLoading={deleteMutation.isPending}
         confirmText="Excluir"
