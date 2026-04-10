@@ -109,7 +109,7 @@ function RecentActivityCard({
   };
 
   return (
-    <Card className="col-span-full lg:col-span-2">
+    <Card>
       <CardHeader>
         <CardTitle>Atividade Recente</CardTitle>
         <CardDescription>Últimas atualizações no sistema</CardDescription>
@@ -259,14 +259,13 @@ export default function DashboardPage() {
   );
   const openRequests = requests.filter((r) => !r.DATA_RESPOSTA).length;
 
-  // Build recent activity from data
   const recentActivity: RecentActivityItem[] = [
     ...employees.slice(0, 3).map((e, i) => ({
       id: i + 1,
       type: "employee" as const,
       title: e.NOME,
       description: `Funcionário ${e.STATUS === "ATIVO" ? "ativo" : "inativo"}`,
-      timestamp: new Date(e.CRIADO_EM).toLocaleDateString("pt-BR"),
+      timestamp: e.CRIADO_EM,
       status: e.STATUS,
     })),
     ...vacations.slice(0, 2).map((v, i) => ({
@@ -274,7 +273,7 @@ export default function DashboardPage() {
       type: "vacation" as const,
       title: v.FUNCIONARIO?.NOME || "Funcionário",
       description: `Férias de ${new Date(v.DATA_INICIO).toLocaleDateString("pt-BR")} a ${new Date(v.DATA_FIM).toLocaleDateString("pt-BR")}`,
-      timestamp: new Date(v.CRIADO_EM).toLocaleDateString("pt-BR"),
+      timestamp: v.CRIADO_EM,
       status: v.STATUS_FERIAS,
     })),
   ]
@@ -336,7 +335,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2">
         <RecentActivityCard activities={recentActivity} isLoading={isLoading} />
         <PendingVacationsCard
           vacations={pendingVacationsList}
