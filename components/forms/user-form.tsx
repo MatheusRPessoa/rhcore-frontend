@@ -22,7 +22,7 @@ import { Spinner } from "@/components/ui/spinner";
 import type { SystemUser, CreateUserData, UpdateUserData } from "@/lib/types";
 
 const userSchema = z.object({
-  USERNAME: z.string().min(1, "Usuário é obrigatório"),
+  NOME_USUARIO: z.string().min(1, "Usuário é obrigatório"),
   PASSWORD: z
     .string()
     .min(6, "Senha deve ter no mínimo 6 caracteres")
@@ -69,7 +69,7 @@ export function UserForm({
           }),
     ),
     defaultValues: {
-      USERNAME: user?.USERNAME || "",
+      NOME_USUARIO: user?.NOME_USUARIO || "",
       PASSWORD: "",
       STATUS: user?.STATUS || "ATIVO",
     },
@@ -80,7 +80,7 @@ export function UserForm({
   const handleFormSubmit = async (data: UserFormData) => {
     if (user) {
       const payload: UpdateUserData = {
-        USERNAME: data.USERNAME,
+        NOME_USUARIO: data.NOME_USUARIO,
         STATUS: data.STATUS,
       };
       if (data.PASSWORD) {
@@ -89,7 +89,7 @@ export function UserForm({
       await onSubmit(payload);
     } else {
       await onSubmit({
-        USERNAME: data.USERNAME,
+        NOME_USUARIO: data.NOME_USUARIO,
         PASSWORD: data.PASSWORD!,
       });
     }
@@ -99,11 +99,11 @@ export function UserForm({
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="USERNAME">Usuário *</FieldLabel>
-          <Input id="USERNAME" {...register("USERNAME")} />
-          {errors.USERNAME && (
+          <FieldLabel htmlFor="NOME_USUARIO">Usuário *</FieldLabel>
+          <Input id="NOME_USUARIO" {...register("NOME_USUARIO")} />
+          {errors.NOME_USUARIO && (
             <FieldMessage variant="error">
-              {errors.USERNAME.message}
+              {errors.NOME_USUARIO.message}
             </FieldMessage>
           )}
         </Field>

@@ -96,6 +96,10 @@ export interface Position {
   ID: string;
   NOME: string;
   DESCRICAO?: string;
+  NIVEL?: string;
+  SALARIO_BASE?: number;
+  DEPARTAMENTO_ID?: string;
+  DEPARTAMENTO?: Department;
   STATUS: "ATIVO" | "INATIVO";
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
@@ -104,6 +108,9 @@ export interface Position {
 export interface CreatePositionData {
   NOME: string;
   DESCRICAO?: string;
+  NIVEL?: string;
+  SALARIO_BASE?: number;
+  DEPARTAMENTO_ID?: string;
 }
 
 export interface UpdatePositionData extends Partial<CreatePositionData> {
@@ -182,19 +189,19 @@ export interface UpdateRequestData extends Partial<CreateRequestData> {
 
 export interface SystemUser {
   ID: string;
-  USERNAME: string;
+  NOME_USUARIO: string;
   STATUS: "ATIVO" | "INATIVO";
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
 }
 
 export interface CreateUserData {
-  USERNAME: string;
+  NOME_USUARIO: string;
   PASSWORD: string;
 }
 
 export interface UpdateUserData {
-  USERNAME?: string;
+  NOME_USUARIO?: string;
   PASSWORD?: string;
   STATUS?: "ATIVO" | "INATIVO";
 }
