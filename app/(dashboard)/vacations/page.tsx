@@ -18,15 +18,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Plus,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  CheckCircle,
+} from "lucide-react";
 import { vacationsApi } from "@/lib/api";
 import type {
   Vacation,
   CreateVacationData,
   UpdateVacationData,
+  VacationStatus,
 } from "@/lib/types";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function VacationsPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedVacation, setSelectedVacation] = useState<
@@ -34,6 +43,10 @@ export default function VacationsPage() {
   >();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [vacationToDelete, setVacationToDelete] = useState<Vacation | null>(
+    null,
+  );
+  const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [vacationToApprove, setVacationToApprove] = useState<Vacation | null>(
     null,
   );
 
@@ -81,6 +94,20 @@ export default function VacationsPage() {
     },
   });
 
+  const approveMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateVacationData }) =>
+      vacationsApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vacations"] });
+      setIsApproveOpen(false);
+      setVacationToApprove(null);
+      toast.success("Férias aprovadas com sucesso!");
+    },
+    onError: () => {
+      toast.error("Erro ao aprovar férias");
+    },
+  });
+
   const handleSubmit = async (
     formData: CreateVacationData | UpdateVacationData,
   ) => {
@@ -107,6 +134,11 @@ export default function VacationsPage() {
   const openDeleteDialog = (vacation: Vacation) => {
     setVacationToDelete(vacation);
     setIsDeleteOpen(true);
+  };
+
+  const openApproveDialog = (vacation: Vacation) => {
+    setVacationToApprove(vacation);
+    setIsApproveOpen(true);
   };
 
   const columns: ColumnDef<Vacation>[] = [
@@ -139,7 +171,7 @@ export default function VacationsPage() {
     {
       accessorKey: "APROVADO_POR",
       header: "Aprovado Por",
-      cell: ({ row }) => row.original.APROVADO_POR?.NOME || "-",
+      cell: ({ row }) => row.original.APROVADO_POR?.NOME_USUARIO || "-",
     },
     {
       id: "actions",
@@ -165,6 +197,14 @@ export default function VacationsPage() {
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Excluir
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => openApproveDialog(vacation)}
+                className="text-green-600"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Aprovar
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -231,6 +271,27 @@ export default function VacationsPage() {
         }
         isLoading={deleteMutation.isPending}
         confirmText="Excluir"
+      />
+
+      <ConfirmDialog
+        open={isApproveOpen}
+        onOpenChange={setIsApproveOpen}
+        title="Aprovar Férias"
+        description={`Tem certeza que deseja aprovar esta solicitação de férias de "${vacationToApprove?.FUNCIONARIO?.NOME}"?`}
+        onConfirm={() =>
+          vacationToApprove &&
+          approveMutation.mutate({
+            id: vacationToApprove.ID,
+            data: {
+              STATUS_FERIAS: "APROVADO" as VacationStatus,
+              DATA_APROVACAO: new Date().toISOString(),
+              APROVADO_POR_ID: user?.ID,
+            },
+          })
+        }
+        isLoading={approveMutation.isPending}
+        confirmText="Aprovar"
+        variant="default"
       />
     </div>
   );

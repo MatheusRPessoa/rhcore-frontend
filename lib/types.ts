@@ -26,6 +26,7 @@ export interface User {
   USERNAME: string;
   STATUS: "ATIVO" | "INATIVO";
   CRIADO_EM: string;
+  FUNCIONARIO_ID?: string;
   ATUALIZADO_POR?: string | null;
 }
 
@@ -136,7 +137,7 @@ export interface Vacation {
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
   FUNCIONARIO?: Employee;
-  APROVADO_POR?: Employee;
+  APROVADO_POR?: VacationApprover;
 }
 
 export interface CreateVacationData {
@@ -150,6 +151,12 @@ export interface UpdateVacationData extends Partial<CreateVacationData> {
   STATUS_FERIAS?: VacationStatus;
   APROVADO_POR_ID?: string;
   DATA_APROVACAO?: string;
+}
+
+export interface VacationApprover {
+  ID: string;
+  NOME_USUARIO: string;
+  EMAIL: string;
 }
 
 export type RequestType =

@@ -26,7 +26,6 @@ import type {
   Vacation,
   CreateVacationData,
   UpdateVacationData,
-  VacationStatus,
 } from "@/lib/types";
 
 const vacationSchema = z.object({
@@ -34,11 +33,6 @@ const vacationSchema = z.object({
   DATA_INICIO: z.string().min(1, "Data de início é obrigatória"),
   DATA_FIM: z.string().min(1, "Data de fim é obrigatória"),
   OBSERVACAO: z.string().max(500, "Máximo de 500 caracteres").optional(),
-  STATUS_FERIAS: z
-    .enum(["PENDENTE", "APROVADO", "REJEITADO", "CANCELADO"])
-    .optional(),
-  APROVADO_POR_ID: z.string().optional(),
-  DATA_APROVACAO: z.string().optional(),
 });
 
 type VacationFormData = z.infer<typeof vacationSchema>;
@@ -77,36 +71,18 @@ export function VacationForm({
       DATA_INICIO: vacation?.DATA_INICIO?.split("T")[0] || "",
       DATA_FIM: vacation?.DATA_FIM?.split("T")[0] || "",
       OBSERVACAO: vacation?.OBSERVACAO || "",
-      STATUS_FERIAS: vacation?.STATUS_FERIAS || "PENDENTE",
-      APROVADO_POR_ID: vacation?.APROVADO_POR_ID?.toString() || "",
-      DATA_APROVACAO: vacation?.DATA_APROVACAO?.split("T")[0] || "",
     },
   });
 
   const funcionarioId = useWatch({ control, name: "FUNCIONARIO_ID" });
-  const statusFerias = useWatch({ control, name: "STATUS_FERIAS" });
-  const aprovadoPorId = useWatch({ control, name: "APROVADO_POR_ID" });
 
   const handleFormSubmit = async (data: VacationFormData) => {
-    const payload: CreateVacationData | UpdateVacationData = {
+    await onSubmit({
       FUNCIONARIO_ID: data.FUNCIONARIO_ID,
       DATA_INICIO: data.DATA_INICIO,
       DATA_FIM: data.DATA_FIM,
       OBSERVACAO: data.OBSERVACAO || undefined,
-    };
-
-    if (vacation) {
-      const updatePayload = payload as UpdateVacationData;
-      updatePayload.STATUS_FERIAS = data.STATUS_FERIAS as VacationStatus;
-      if (data.APROVADO_POR_ID) {
-        updatePayload.APROVADO_POR_ID = data.APROVADO_POR_ID;
-      }
-      if (data.DATA_APROVACAO) {
-        updatePayload.DATA_APROVACAO = data.DATA_APROVACAO;
-      }
-    }
-
-    await onSubmit(payload);
+    });
   };
 
   return (
@@ -173,60 +149,6 @@ export function VacationForm({
             </FieldMessage>
           )}
         </Field>
-
-        {vacation && (
-          <>
-            <Field>
-              <FieldLabel>Status</FieldLabel>
-              <Select
-                value={statusFerias}
-                onValueChange={(value) =>
-                  setValue("STATUS_FERIAS", value as VacationStatus)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PENDENTE">Pendente</SelectItem>
-                  <SelectItem value="APROVADO">Aprovado</SelectItem>
-                  <SelectItem value="REJEITADO">Rejeitado</SelectItem>
-                  <SelectItem value="CANCELADO">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field>
-              <FieldLabel>Aprovado Por</FieldLabel>
-              <Select
-                value={aprovadoPorId}
-                onValueChange={(value) => setValue("APROVADO_POR_ID", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {employees.map((emp) => (
-                    <SelectItem key={emp.ID} value={emp.ID.toString()}>
-                      {emp.NOME}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="DATA_APROVACAO">
-                Data de Aprovação
-              </FieldLabel>
-              <Input
-                id="DATA_APROVACAO"
-                type="date"
-                {...register("DATA_APROVACAO")}
-              />
-            </Field>
-          </>
-        )}
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
