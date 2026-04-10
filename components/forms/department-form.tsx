@@ -39,7 +39,7 @@ const departmentSchema = z.object({
     .max(10, "Sigla deve ter no máximo 10 caracteres"),
   DESCRICAO: z
     .string()
-    .max(255, "Descrição deve ter no máximo 255 caracteres")
+    .max(80, "Descrição deve ter no máximo 80 caracteres")
     .optional(),
   DEPARTAMENTO_PAI_ID: z.string().optional(),
   STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
@@ -139,8 +139,8 @@ export function DepartmentForm({
           <Textarea
             id="DESCRICAO"
             {...register("DESCRICAO")}
-            rows={3}
-            maxLength={255}
+            rows={1}
+            maxLength={80}
           />
           {errors.DESCRICAO && (
             <FieldMessage variant="error">

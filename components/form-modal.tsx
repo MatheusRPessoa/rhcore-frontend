@@ -33,7 +33,7 @@ export function FormModal({
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <ScrollArea className="max-h-[calc(90vh-120px)] px-6 pb-6">
-          {children}
+          <div className="w-full min-w-0">{children}</div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
