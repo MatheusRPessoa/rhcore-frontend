@@ -116,6 +116,18 @@ export default function UsersPage() {
         new Date(row.original.CRIADO_EM).toLocaleDateString("pt-BR"),
     },
     {
+      accessorKey: "ROLE",
+      header: "Função",
+      cell: ({ row }) => {
+        const labels: Record<string, string> = {
+          ADMIN: "Administrador",
+          MANAGER: "Gerente",
+          EMPLOYEE: "Funcionário",
+        };
+        return labels[row.original.ROLE] ?? row.original.ROLE;
+      },
+    },
+    {
       id: "actions",
       header: "Ações",
       cell: ({ row }) => {

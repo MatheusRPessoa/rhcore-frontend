@@ -10,10 +10,11 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { authApi, setTokens } from "@/lib/api";
-import type { User, LoginCredentials } from "@/lib/types";
+import type { User, LoginCredentials, UserRole } from "@/lib/types";
 
 interface AuthContextType {
   user: User | null;
+  role: UserRole | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        role: user?.ROLE || null,
         isLoading,
         isAuthenticated: !!user,
         login,
