@@ -19,7 +19,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import type { SystemUser, CreateUserData, UpdateUserData } from "@/lib/types";
+import type {
+  SystemUser,
+  CreateUserData,
+  UpdateUserData,
+  UserRole,
+} from "@/lib/types";
 
 const userSchema = z.object({
   NOME_USUARIO: z.string().min(1, "O Nome do usuário é obrigatório"),
@@ -30,6 +35,7 @@ const userSchema = z.object({
     .optional()
     .or(z.literal("")),
   STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
+  ROLE: z.enum(["ADMIN", "MANAGER", "EMPLOYEE"]),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -72,10 +78,12 @@ export function UserForm({
       EMAIL: user?.EMAIL || "",
       SENHA: "",
       STATUS: user?.STATUS || "ATIVO",
+      ROLE: user?.ROLE || "EMPLOYEE",
     },
   });
 
   const status = useWatch({ control, name: "STATUS" });
+  const role = useWatch({ control, name: "ROLE" });
 
   const handleFormSubmit = async (formValues: UserFormData) => {
     if (user) {
@@ -83,6 +91,7 @@ export function UserForm({
         NOME_USUARIO: formValues.NOME_USUARIO,
         EMAIL: formValues.EMAIL,
         STATUS: formValues.STATUS,
+        ROLE: formValues.ROLE,
       };
       if (formValues.SENHA) {
         payload.SENHA = formValues.SENHA;
@@ -93,6 +102,7 @@ export function UserForm({
         NOME_USUARIO: formValues.NOME_USUARIO,
         EMAIL: formValues.EMAIL,
         SENHA: formValues.SENHA!,
+        ROLE: formValues.ROLE,
       });
     }
   };
@@ -129,23 +139,42 @@ export function UserForm({
         </Field>
 
         {user && (
-          <Field>
-            <FieldLabel>Status</FieldLabel>
-            <Select
-              value={status}
-              onValueChange={(value) =>
-                setValue("STATUS", value as "ATIVO" | "INATIVO")
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ATIVO">Ativo</SelectItem>
-                <SelectItem value="INATIVO">Inativo</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel>Status</FieldLabel>
+              <Select
+                value={status}
+                onValueChange={(value) =>
+                  setValue("STATUS", value as "ATIVO" | "INATIVO")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ATIVO">Ativo</SelectItem>
+                  <SelectItem value="INATIVO">Inativo</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field>
+              <FieldLabel>Função</FieldLabel>
+              <Select
+                value={role}
+                onValueChange={(value) => setValue("ROLE", value as UserRole)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ADMIN">Administrador</SelectItem>
+                  <SelectItem value="MANAGER">Gerente</SelectItem>
+                  <SelectItem value="EMPLOYEE">Funcionário</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
         )}
 
         <div className="flex justify-end gap-2 pt-4">

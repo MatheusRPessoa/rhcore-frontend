@@ -16,15 +16,19 @@ export interface LoginCredentials {
   password: string;
 }
 
+export type UserRole = "ADMIN" | "MANAGER" | "EMPLOYEE";
+
 export interface AuthTokens {
   access_token: string;
   refresh_token: string;
+  role?: UserRole;
 }
 
 export interface User {
   ID: string;
   USERNAME: string;
   STATUS: "ATIVO" | "INATIVO";
+  ROLE: UserRole;
   CRIADO_EM: string;
   FUNCIONARIO_ID?: string;
   ATUALIZADO_POR?: string | null;
@@ -199,6 +203,7 @@ export interface SystemUser {
   NOME_USUARIO: string;
   EMAIL: string;
   STATUS: "ATIVO" | "INATIVO";
+  ROLE: UserRole;
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
 }
@@ -207,6 +212,7 @@ export interface CreateUserData {
   NOME_USUARIO: string;
   EMAIL: string;
   SENHA: string;
+  ROLE: UserRole;
 }
 
 export interface UpdateUserData {
@@ -214,6 +220,7 @@ export interface UpdateUserData {
   EMAIL?: string;
   SENHA?: string;
   STATUS?: "ATIVO" | "INATIVO";
+  ROLE?: UserRole;
 }
 
 export interface DashboardSummary {
