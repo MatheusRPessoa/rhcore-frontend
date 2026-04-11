@@ -138,6 +138,23 @@ export function UserForm({
           )}
         </Field>
 
+        <Field>
+          <FieldLabel>Função *</FieldLabel>
+          <Select
+            value={role}
+            onValueChange={(value) => setValue("ROLE", value as UserRole)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ADMIN">Administrador</SelectItem>
+              <SelectItem value="MANAGER">Gerente</SelectItem>
+              <SelectItem value="EMPLOYEE">Funcionário</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+
         {user && (
           <div className="grid grid-cols-2 gap-4">
             <Field>
