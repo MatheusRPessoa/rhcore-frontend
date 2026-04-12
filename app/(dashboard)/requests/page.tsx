@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Plus, MoreHorizontal, Pencil, Trash2, Check } from "lucide-react";
 import { requestsApi } from "@/lib/api";
 import type {
   HRRequest,
@@ -34,6 +34,11 @@ export default function RequestsPage() {
   >();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<HRRequest | null>(
+    null,
+  );
+
+  const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [requestToApprove, setRequestToApprove] = useState<HRRequest | null>(
     null,
   );
 
@@ -81,6 +86,19 @@ export default function RequestsPage() {
     },
   });
 
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => requestsApi.approve(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      setIsApproveOpen(false);
+      setRequestToApprove(null);
+      toast.success("Solicitação aprovada com sucesso!");
+    },
+    onError: () => {
+      toast.error("Erro ao aprovar solicitação");
+    },
+  });
+
   const handleSubmit = async (
     formData: CreateRequestData | UpdateRequestData,
   ) => {
@@ -107,6 +125,11 @@ export default function RequestsPage() {
   const openDeleteDialog = (request: HRRequest) => {
     setRequestToDelete(request);
     setIsDeleteOpen(true);
+  };
+
+  const openApproveDialog = (request: HRRequest) => {
+    setRequestToApprove(request);
+    setIsApproveOpen(true);
   };
 
   const columns: ColumnDef<HRRequest>[] = [
@@ -146,7 +169,7 @@ export default function RequestsPage() {
     {
       accessorKey: "APROVADO_POR",
       header: "Aprovado Por",
-      cell: ({ row }) => row.original.APROVADO_POR?.NOME || "-",
+      cell: ({ row }) => row.original.APROVADO_POR?.NOME_USUARIO || "-",
     },
     {
       id: "actions",
@@ -172,6 +195,13 @@ export default function RequestsPage() {
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Excluir
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => openApproveDialog(request)}
+                className="text-green-500"
+              >
+                <Check className="mr-2 h-4 w-4" />
+                Aprovar
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -236,6 +266,19 @@ export default function RequestsPage() {
         }
         isLoading={deleteMutation.isPending}
         confirmText="Excluir"
+      />
+
+      <ConfirmDialog
+        open={isApproveOpen}
+        onOpenChange={setIsApproveOpen}
+        title="Aprovar Solicitação"
+        description={`Tem certeza que deseja aprovar esta solicitação de "${requestToApprove?.FUNCIONARIO?.NOME}"?`}
+        onConfirm={() =>
+          requestToApprove && approveMutation.mutate(requestToApprove.ID)
+        }
+        isLoading={approveMutation.isPending}
+        confirmText="Aprovar"
+        variant="default"
       />
     </div>
   );
