@@ -42,7 +42,7 @@ const departmentSchema = z.object({
     .max(80, "Descrição deve ter no máximo 80 caracteres")
     .optional(),
   DEPARTAMENTO_PAI_ID: z.string().optional(),
-  STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
+  STATUS: z.enum(["ATIVO", "INATIVO", "EXCLUIDO", "PENDENTE"]).optional(),
 });
 
 type DepartmentFormData = z.infer<typeof departmentSchema>;
@@ -149,51 +149,58 @@ export function DepartmentForm({
           )}
         </Field>
 
-        <Field>
-          <FieldLabel htmlFor="DEPARTAMENTO_PAI_ID">
-            Departamento Pai
-          </FieldLabel>
-          <Select
-            value={departamentoPaiId}
-            onValueChange={(value) => setValue("DEPARTAMENTO_PAI_ID", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Nenhum (raiz)" />
-            </SelectTrigger>
-            <SelectContent>
-              {departments.map((dept) => (
-                <SelectItem key={dept.ID} value={dept.ID}>
-                  {dept.NOME}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.DEPARTAMENTO_PAI_ID && (
-            <FieldMessage variant="error">
-              {errors.DEPARTAMENTO_PAI_ID.message}
-            </FieldMessage>
-          )}
-        </Field>
-
-        {department && (
+        <div className="grid grid-cols-2 gap-4">
           <Field>
-            <FieldLabel>Status</FieldLabel>
+            <FieldLabel htmlFor="DEPARTAMENTO_PAI_ID">
+              Departamento Pai
+            </FieldLabel>
             <Select
-              value={status}
-              onValueChange={(value) =>
-                setValue("STATUS", value as "ATIVO" | "INATIVO")
-              }
+              value={departamentoPaiId}
+              onValueChange={(value) => setValue("DEPARTAMENTO_PAI_ID", value)}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Nenhum (raiz)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ATIVO">Ativo</SelectItem>
-                <SelectItem value="INATIVO">Inativo</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.ID} value={dept.ID}>
+                    {dept.NOME}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            {errors.DEPARTAMENTO_PAI_ID && (
+              <FieldMessage variant="error">
+                {errors.DEPARTAMENTO_PAI_ID.message}
+              </FieldMessage>
+            )}
           </Field>
-        )}
+
+          {department && (
+            <Field>
+              <FieldLabel>Status</FieldLabel>
+              <Select
+                value={status}
+                onValueChange={(value) =>
+                  setValue(
+                    "STATUS",
+                    value as "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE",
+                  )
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ATIVO">Ativo</SelectItem>
+                  <SelectItem value="INATIVO">Inativo</SelectItem>
+                  <SelectItem value="EXCLUIDO">Excluído</SelectItem>
+                  <SelectItem value="PENDENTE">Pendente</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+        </div>
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>

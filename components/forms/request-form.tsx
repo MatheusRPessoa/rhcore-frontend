@@ -45,7 +45,6 @@ const requestSchema = z.object({
   DATA_SOLICITACAO: z.string().min(1, "Data de solicitação é obrigatória"),
   OBSERVACAO: z.string().max(500, "Máximo de 500 caracteres").optional(),
   DATA_RESPOSTA: z.string().optional(),
-  APROVADO_POR_ID: z.string().optional(),
 });
 
 type RequestFormData = z.infer<typeof requestSchema>;
@@ -96,13 +95,11 @@ export function RequestForm({
         new Date().toISOString().split("T")[0],
       OBSERVACAO: request?.OBSERVACAO || "",
       DATA_RESPOSTA: request?.DATA_RESPOSTA?.split("T")[0] || "",
-      APROVADO_POR_ID: request?.APROVADO_POR_ID?.toString() || "",
     },
   });
 
   const funcionarioId = useWatch({ control, name: "FUNCIONARIO_ID" });
   const tipo = useWatch({ control, name: "TIPO" });
-  const aprovadoPorId = useWatch({ control, name: "APROVADO_POR_ID" });
 
   const handleFormSubmit = async (data: RequestFormData) => {
     const payload: CreateRequestData | UpdateRequestData = {
@@ -117,9 +114,6 @@ export function RequestForm({
       const updatePayload = payload as UpdateRequestData;
       if (data.DATA_RESPOSTA) {
         updatePayload.DATA_RESPOSTA = data.DATA_RESPOSTA;
-      }
-      if (data.APROVADO_POR_ID) {
-        updatePayload.APROVADO_POR_ID = data.APROVADO_POR_ID;
       }
     }
 
@@ -234,25 +228,6 @@ export function RequestForm({
                 type="date"
                 {...register("DATA_RESPOSTA")}
               />
-            </Field>
-
-            <Field>
-              <FieldLabel>Aprovado Por</FieldLabel>
-              <Select
-                value={aprovadoPorId}
-                onValueChange={(value) => setValue("APROVADO_POR_ID", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {employees.map((emp) => (
-                    <SelectItem key={emp.ID} value={emp.ID.toString()}>
-                      {emp.NOME}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </Field>
           </div>
         )}

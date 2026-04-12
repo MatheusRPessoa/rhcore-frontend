@@ -27,7 +27,7 @@ export interface AuthTokens {
 export interface User {
   ID: string;
   USERNAME: string;
-  STATUS: "ATIVO" | "INATIVO";
+  STATUS: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
   ROLE: UserRole;
   CRIADO_EM: string;
   FUNCIONARIO_ID?: string;
@@ -47,7 +47,7 @@ export interface Employee {
   DEPARTAMENTO_ID?: string;
   CARGO_ID?: string;
   GESTOR_ID?: string;
-  STATUS: "ATIVO" | "INATIVO";
+  STATUS: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
   DEPARTAMENTO?: Department;
@@ -70,7 +70,7 @@ export interface CreateEmployeeData {
 }
 
 export interface UpdateEmployeeData extends Partial<CreateEmployeeData> {
-  STATUS?: "ATIVO" | "INATIVO";
+  STATUS?: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
 }
 
 export interface Department {
@@ -79,7 +79,7 @@ export interface Department {
   SIGLA: string;
   DESCRICAO?: string | null;
   DEPARTAMENTO_PAI?: Department;
-  STATUS: "ATIVO" | "INATIVO";
+  STATUS: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
   CRIADO_POR: string;
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
@@ -94,7 +94,7 @@ export interface CreateDepartmentData {
 }
 
 export interface UpdateDepartmentData extends Partial<CreateDepartmentData> {
-  STATUS?: "ATIVO" | "INATIVO";
+  STATUS?: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
 }
 
 export interface Position {
@@ -105,7 +105,7 @@ export interface Position {
   SALARIO_BASE?: number;
   DEPARTAMENTO_ID?: string;
   DEPARTAMENTO?: Department;
-  STATUS: "ATIVO" | "INATIVO";
+  STATUS: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
 }
@@ -119,7 +119,7 @@ export interface CreatePositionData {
 }
 
 export interface UpdatePositionData extends Partial<CreatePositionData> {
-  STATUS?: "ATIVO" | "INATIVO";
+  STATUS?: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
 }
 
 export type VacationStatus =
@@ -182,7 +182,8 @@ export interface HRRequest {
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
   FUNCIONARIO?: Employee;
-  APROVADO_POR?: Employee;
+  APROVADO_POR?: SystemUser;
+  STATUS: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
 }
 
 export interface CreateRequestData {
@@ -196,13 +197,14 @@ export interface CreateRequestData {
 export interface UpdateRequestData extends Partial<CreateRequestData> {
   DATA_RESPOSTA?: string;
   APROVADO_POR_ID?: string;
+  STATUS?: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
 }
 
 export interface SystemUser {
   ID: string;
   NOME_USUARIO: string;
   EMAIL: string;
-  STATUS: "ATIVO" | "INATIVO";
+  STATUS: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
   ROLE: UserRole;
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
@@ -219,7 +221,7 @@ export interface UpdateUserData {
   NOME_USUARIO?: string;
   EMAIL?: string;
   SENHA?: string;
-  STATUS?: "ATIVO" | "INATIVO";
+  STATUS?: "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE";
   ROLE?: UserRole;
 }
 

@@ -311,6 +311,12 @@ export const requestsApi = {
     });
   },
 
+  approve: async (id: string): Promise<ApiResponse<HRRequest>> => {
+    return apiRequest<ApiResponse<HRRequest>>(`/requests/${id}/approve`, {
+      method: "PATCH",
+    });
+  },
+
   delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiRequest<ApiResponse<void>>(`/requests/${id}`, {
       method: "DELETE",

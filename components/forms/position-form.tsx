@@ -89,14 +89,16 @@ export function PositionForm({
       NIVEL: position?.NIVEL || "",
       SALARIO_BASE: position?.SALARIO_BASE || undefined,
       DEPARTAMENTO_ID: position?.DEPARTAMENTO_ID || "",
-      STATUS: position?.STATUS || "ATIVO",
+      STATUS: position?.STATUS === "INATIVO" ? "INATIVO" : "ATIVO",
     },
   });
 
   const status = useWatch({ control, name: "STATUS" });
   const departamentoId = useWatch({ control, name: "DEPARTAMENTO_ID" });
 
-  const handleFormSubmit = async (data: PositionFormData) => {
+  const handleFormSubmit = async (
+    data: ReturnType<typeof positionSchema.parse>,
+  ) => {
     const payload: CreatePositionData | UpdatePositionData = {
       NOME: data.NOME,
       DESCRICAO: data.DESCRICAO || undefined,

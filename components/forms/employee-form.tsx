@@ -45,7 +45,7 @@ const employeeSchema = z.object({
   DEPARTAMENTO_ID: z.string().optional(),
   CARGO_ID: z.string().optional(),
   GESTOR_ID: z.string().optional(),
-  STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
+  STATUS: z.enum(["ATIVO", "INATIVO", "EXCLUIDO", "PENDENTE"]).optional(),
 });
 
 type EmployeeFormData = z.infer<typeof employeeSchema>;
@@ -246,45 +246,43 @@ export function EmployeeForm({
           )}
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel>Departamento</FieldLabel>
-            <Select
-              value={departamentoId}
-              onValueChange={(value) => setValue("DEPARTAMENTO_ID", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept.ID} value={dept.ID.toString()}>
-                    {dept.NOME}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+        <Field>
+          <FieldLabel>Departamento</FieldLabel>
+          <Select
+            value={departamentoId}
+            onValueChange={(value) => setValue("DEPARTAMENTO_ID", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione..." />
+            </SelectTrigger>
+            <SelectContent>
+              {departments.map((dept) => (
+                <SelectItem key={dept.ID} value={dept.ID.toString()}>
+                  {dept.NOME}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
 
-          <Field>
-            <FieldLabel>Cargo</FieldLabel>
-            <Select
-              value={cargoId}
-              onValueChange={(value) => setValue("CARGO_ID", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent>
-                {positions.map((pos) => (
-                  <SelectItem key={pos.ID} value={pos.ID.toString()}>
-                    {pos.NOME}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </div>
+        <Field>
+          <FieldLabel>Cargo</FieldLabel>
+          <Select
+            value={cargoId}
+            onValueChange={(value) => setValue("CARGO_ID", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione..." />
+            </SelectTrigger>
+            <SelectContent>
+              {positions.map((pos) => (
+                <SelectItem key={pos.ID} value={pos.ID.toString()}>
+                  {pos.NOME}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
 
         <Field>
           <FieldLabel>Gestor</FieldLabel>
@@ -292,7 +290,7 @@ export function EmployeeForm({
             value={gestorId}
             onValueChange={(value) => setValue("GESTOR_ID", value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione..." />
             </SelectTrigger>
             <SelectContent>
@@ -311,15 +309,20 @@ export function EmployeeForm({
             <Select
               value={status}
               onValueChange={(value) =>
-                setValue("STATUS", value as "ATIVO" | "INATIVO")
+                setValue(
+                  "STATUS",
+                  value as "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE",
+                )
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ATIVO">Ativo</SelectItem>
                 <SelectItem value="INATIVO">Inativo</SelectItem>
+                <SelectItem value="EXCLUIDO">Excluído</SelectItem>
+                <SelectItem value="PENDENTE">Pendente</SelectItem>
               </SelectContent>
             </Select>
           </Field>
