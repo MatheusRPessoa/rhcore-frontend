@@ -34,7 +34,7 @@ const userSchema = z.object({
     .min(6, "Senha deve ter no mínimo 6 caracteres")
     .optional()
     .or(z.literal("")),
-  STATUS: z.enum(["ATIVO", "INATIVO", "EXCLUIDO", "PENDENTE"]).optional(),
+  STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
   ROLE: z.enum(["ADMIN", "MANAGER", "EMPLOYEE"]),
 });
 
@@ -162,10 +162,7 @@ export function UserForm({
               <Select
                 value={status}
                 onValueChange={(value) =>
-                  setValue(
-                    "STATUS",
-                    value as "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE",
-                  )
+                  setValue("STATUS", value as "ATIVO" | "INATIVO")
                 }
               >
                 <SelectTrigger>
@@ -174,8 +171,6 @@ export function UserForm({
                 <SelectContent>
                   <SelectItem value="ATIVO">Ativo</SelectItem>
                   <SelectItem value="INATIVO">Inativo</SelectItem>
-                  <SelectItem value="EXCLUIDO">Excluído</SelectItem>
-                  <SelectItem value="PENDENTE">Pendente</SelectItem>
                 </SelectContent>
               </Select>
             </Field>

@@ -42,7 +42,7 @@ const departmentSchema = z.object({
     .max(80, "Descrição deve ter no máximo 80 caracteres")
     .optional(),
   DEPARTAMENTO_PAI_ID: z.string().optional(),
-  STATUS: z.enum(["ATIVO", "INATIVO", "EXCLUIDO", "PENDENTE"]).optional(),
+  STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
 });
 
 type DepartmentFormData = z.infer<typeof departmentSchema>;
@@ -182,10 +182,7 @@ export function DepartmentForm({
               <Select
                 value={status}
                 onValueChange={(value) =>
-                  setValue(
-                    "STATUS",
-                    value as "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE",
-                  )
+                  setValue("STATUS", value as "ATIVO" | "INATIVO")
                 }
               >
                 <SelectTrigger>
@@ -194,8 +191,6 @@ export function DepartmentForm({
                 <SelectContent>
                   <SelectItem value="ATIVO">Ativo</SelectItem>
                   <SelectItem value="INATIVO">Inativo</SelectItem>
-                  <SelectItem value="EXCLUIDO">Excluído</SelectItem>
-                  <SelectItem value="PENDENTE">Pendente</SelectItem>
                 </SelectContent>
               </Select>
             </Field>

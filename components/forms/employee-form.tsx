@@ -45,7 +45,7 @@ const employeeSchema = z.object({
   DEPARTAMENTO_ID: z.string().optional(),
   CARGO_ID: z.string().optional(),
   GESTOR_ID: z.string().optional(),
-  STATUS: z.enum(["ATIVO", "INATIVO", "EXCLUIDO", "PENDENTE"]).optional(),
+  STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
 });
 
 type EmployeeFormData = z.infer<typeof employeeSchema>;
@@ -309,10 +309,7 @@ export function EmployeeForm({
             <Select
               value={status}
               onValueChange={(value) =>
-                setValue(
-                  "STATUS",
-                  value as "ATIVO" | "INATIVO" | "EXCLUIDO" | "PENDENTE",
-                )
+                setValue("STATUS", value as "ATIVO" | "INATIVO")
               }
             >
               <SelectTrigger className="w-full">
@@ -321,8 +318,6 @@ export function EmployeeForm({
               <SelectContent>
                 <SelectItem value="ATIVO">Ativo</SelectItem>
                 <SelectItem value="INATIVO">Inativo</SelectItem>
-                <SelectItem value="EXCLUIDO">Excluído</SelectItem>
-                <SelectItem value="PENDENTE">Pendente</SelectItem>
               </SelectContent>
             </Select>
           </Field>
