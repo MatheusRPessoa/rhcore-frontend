@@ -13,11 +13,9 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { LogOut, User } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export function TopBar() {
   const { user, logout } = useAuth();
-  const router = useRouter();
 
   const initials = user?.USERNAME
     ? user.USERNAME.slice(0, 2).toUpperCase()
@@ -48,7 +46,7 @@ export function TopBar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/profile")}>
+            <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
               <span>Meu Perfil</span>
             </DropdownMenuItem>
