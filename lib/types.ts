@@ -223,6 +223,8 @@ export interface UpdateUserData {
   SENHA?: string;
   STATUS?: "ATIVO" | "INATIVO";
   ROLE?: UserRole;
+  SENHA_ATUAL?: string;
+  NOVA_SENHA?: string;
 }
 
 export interface DashboardSummary {

@@ -34,10 +34,13 @@ const STATUS_LABELS: Record<string, string> = {
 
 const passwordSchema = z
   .object({
-    SENHA: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+    SENHA_ATUAL: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+    NOVA_SENHA: z
+      .string()
+      .min(6, "A nova senha deve ter no mínimo 6 caracteres"),
     CONFIRMAR_SENHA: z.string().min(1, "Confirmação de senha é obrigatória"),
   })
-  .refine((data) => data.SENHA === data.CONFIRMAR_SENHA, {
+  .refine((data) => data.NOVA_SENHA === data.CONFIRMAR_SENHA, {
     message: "As senhas não coincidem",
     path: ["CONFIRMAR_SENHA"],
   });
@@ -57,7 +60,11 @@ export default function ProfilePage() {
   });
 
   const { mutate: changePassword, isPending } = useMutation({
-    mutationFn: (senha: string) => usersApi.update(user!.ID, { SENHA: senha }),
+    mutationFn: (data: { SENHA_ATUAL: string; NOVA_SENHA: string }) =>
+      usersApi.update(user!.ID, {
+        SENHA_ATUAL: data.SENHA_ATUAL,
+        NOVA_SENHA: data.NOVA_SENHA,
+      }),
     onSuccess: () => {
       toast.success("Senha alterada com sucesso");
       reset();
@@ -141,14 +148,38 @@ export default function ProfilePage() {
           <CardTitle className="text-base">Alterar Senha</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit((data) => changePassword(data.SENHA))}>
+          <form
+            onSubmit={handleSubmit((data) =>
+              changePassword({
+                SENHA_ATUAL: data.SENHA_ATUAL,
+                NOVA_SENHA: data.NOVA_SENHA,
+              }),
+            )}
+          >
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="SENHA">Nova Senha</FieldLabel>
-                <Input id="SENHA" type="password" {...register("SENHA")} />
-                {errors.SENHA && (
+                <FieldLabel htmlFor="SENHA_ATUAL">Senha Atual</FieldLabel>
+                <Input
+                  id="SENHA_ATUAL"
+                  type="password"
+                  {...register("SENHA_ATUAL")}
+                />
+                {errors.SENHA_ATUAL && (
                   <FieldMessage variant="error">
-                    {errors.SENHA.message}
+                    {errors.SENHA_ATUAL.message}
+                  </FieldMessage>
+                )}
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="NOVA_SENHA">Nova Senha</FieldLabel>
+                <Input
+                  id="NOVA_SENHA"
+                  type="password"
+                  {...register("NOVA_SENHA")}
+                />
+                {errors.NOVA_SENHA && (
+                  <FieldMessage variant="error">
+                    {errors.NOVA_SENHA.message}
                   </FieldMessage>
                 )}
               </Field>
