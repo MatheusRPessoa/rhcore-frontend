@@ -21,14 +21,7 @@ import {
   Clock,
   UserPlus,
 } from "lucide-react";
-import {
-  employeesApi,
-  departmentsApi,
-  positionsApi,
-  vacationsApi,
-  requestsApi,
-} from "@/lib/api";
-
+import { dashboardApi, vacationsApi } from "@/lib/api";
 interface StatCardProps {
   title: string;
   value: number | string;
@@ -214,74 +207,42 @@ function PendingVacationsCard({
 }
 
 export default function DashboardPage() {
-  // Fetch counts from individual endpoints as fallback
-  const { data: employeesData, isLoading: employeesLoading } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => employeesApi.getAll(),
+  const { data: summaryData, isLoading: summaryLoading } = useQuery({
+    queryKey: ["dashboard-summary"],
+    queryFn: () => dashboardApi.getSummary(),
   });
 
-  const { data: departmentsData, isLoading: departmentsLoading } = useQuery({
-    queryKey: ["departments"],
-    queryFn: () => departmentsApi.getAll(),
-  });
-
-  const { data: positionsData, isLoading: positionsLoading } = useQuery({
-    queryKey: ["positions"],
-    queryFn: () => positionsApi.getAll(),
+  const { data: activityData, isLoading: activityLoading } = useQuery({
+    queryKey: ["dashboard-activity"],
+    queryFn: () => dashboardApi.getRecentActivity(),
   });
 
   const { data: vacationsData, isLoading: vacationsLoading } = useQuery({
-    queryKey: ["vacations"],
+    queryKey: ["vacations-pending"],
     queryFn: () => vacationsApi.getAll(),
   });
 
-  const { data: requestsData, isLoading: requestsLoading } = useQuery({
-    queryKey: ["requests"],
-    queryFn: () => requestsApi.getAll(),
-  });
+  const isLoading = summaryLoading || activityLoading;
 
-  const isLoading =
-    employeesLoading ||
-    departmentsLoading ||
-    positionsLoading ||
-    vacationsLoading ||
-    requestsLoading;
-
-  const employees = employeesData?.data || [];
-  const departments = departmentsData?.data || [];
-  const positions = positionsData?.data || [];
-  const vacations = vacationsData?.data || [];
-  const requests = requestsData?.data || [];
-
-  const activeEmployees = employees.filter((e) => e.STATUS === "ATIVO").length;
-  const pendingVacations = vacations.filter(
+  const summary = summaryData?.data;
+  const activities = activityData?.data ?? [];
+  const pendingVacations = (vacationsData?.data ?? []).filter(
     (v) => v.STATUS_FERIAS === "PENDENTE",
   );
-  const openRequests = requests.filter((r) => !r.DATA_RESPOSTA).length;
 
-  const recentActivity: RecentActivityItem[] = [
-    ...employees.slice(0, 3).map((e, i) => ({
-      id: i + 1,
-      type: "employee" as const,
-      title: e.NOME,
-      description: `Funcionário ${e.STATUS === "ATIVO" ? "ativo" : "inativo"}`,
-      timestamp: e.CRIADO_EM,
-      status: e.STATUS,
-    })),
-    ...vacations.slice(0, 2).map((v, i) => ({
-      id: i + 100,
-      type: "vacation" as const,
-      title: v.FUNCIONARIO?.NOME || "Funcionário",
-      description: `Férias de ${new Date(v.DATA_INICIO).toLocaleDateString("pt-BR")} a ${new Date(v.DATA_FIM).toLocaleDateString("pt-BR")}`,
-      timestamp: v.CRIADO_EM,
-      status: v.STATUS_FERIAS,
-    })),
-  ]
-    .sort(
-      (a, b) =>
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-    )
-    .slice(0, 5);
+  const recentActivity: RecentActivityItem[] = activities.map((a) => ({
+    id: a.id,
+    type: a.type,
+    title: a.description,
+    description: new Date(a.timestamp).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    timestamp: a.timestamp,
+  }));
 
   const pendingVacationsList = pendingVacations.slice(0, 5).map((v) => ({
     name: v.FUNCIONARIO?.NOME || "Funcionário",
@@ -303,31 +264,31 @@ export default function DashboardPage() {
           <>
             <StatCard
               title="Total Funcionários"
-              value={activeEmployees}
+              value={summary?.totalEmployees ?? 0}
               description="Funcionários ativos"
               icon={<Users className="h-4 w-4" />}
             />
             <StatCard
               title="Departamentos"
-              value={departments.filter((d) => d.STATUS === "ATIVO").length}
+              value={summary?.totalDepartments ?? 0}
               description="Departamentos ativos"
               icon={<Building2 className="h-4 w-4" />}
             />
             <StatCard
               title="Cargos"
-              value={positions.filter((p) => p.STATUS === "ATIVO").length}
+              value={summary?.totalPositions ?? 0}
               description="Cargos cadastrados"
               icon={<Briefcase className="h-4 w-4" />}
             />
             <StatCard
               title="Férias Pendentes"
-              value={pendingVacations.length}
+              value={summary?.pendingVacations ?? 0}
               description="Aguardando aprovação"
               icon={<Palmtree className="h-4 w-4" />}
             />
             <StatCard
               title="Solicitações Abertas"
-              value={openRequests}
+              value={summary?.openRequests ?? 0}
               description="Sem resposta"
               icon={<FileText className="h-4 w-4" />}
             />
