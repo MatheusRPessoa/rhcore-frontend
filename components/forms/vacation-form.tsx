@@ -42,6 +42,8 @@ interface VacationFormProps {
   onSubmit: (data: CreateVacationData | UpdateVacationData) => Promise<void>;
   isSubmitting: boolean;
   onCancel: () => void;
+  role?: string;
+  employeeId?: string;
 }
 
 export function VacationForm({
@@ -49,10 +51,15 @@ export function VacationForm({
   onSubmit,
   isSubmitting,
   onCancel,
+  role,
+  employeeId,
 }: VacationFormProps) {
+  const isEmployee = role === "EMPLOYEE";
+
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: () => employeesApi.getAll(),
+    enabled: !isEmployee,
   });
 
   const employees =
@@ -67,7 +74,9 @@ export function VacationForm({
   } = useForm<VacationFormData>({
     resolver: zodResolver(vacationSchema),
     defaultValues: {
-      FUNCIONARIO_ID: vacation?.FUNCIONARIO_ID?.toString() || "",
+      FUNCIONARIO_ID:
+        vacation?.FUNCIONARIO_ID?.toString() ||
+        (isEmployee ? (employeeId ?? "") : ""),
       DATA_INICIO: vacation?.DATA_INICIO?.split("T")[0] || "",
       DATA_FIM: vacation?.DATA_FIM?.split("T")[0] || "",
       OBSERVACAO: vacation?.OBSERVACAO || "",
@@ -85,32 +94,43 @@ export function VacationForm({
     });
   };
 
+  if (isEmployee && !employeeId) {
+    return (
+      <p className="text-sm text-destructive py-4">
+        Seu usuário não está vinculado a um funcionário. Contate o
+        administrador.
+      </p>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <FieldGroup>
-        <Field>
-          <FieldLabel>Funcionário *</FieldLabel>
-          <Select
-            value={funcionarioId}
-            onValueChange={(value) => setValue("FUNCIONARIO_ID", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um funcionário..." />
-            </SelectTrigger>
-            <SelectContent>
-              {employees.map((emp) => (
-                <SelectItem key={emp.ID} value={emp.ID.toString()}>
-                  {emp.NOME}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.FUNCIONARIO_ID && (
-            <FieldMessage variant="error">
-              {errors.FUNCIONARIO_ID.message}
-            </FieldMessage>
-          )}
-        </Field>
+        {!isEmployee && (
+          <Field>
+            <FieldLabel>Funcionário *</FieldLabel>
+            <Select
+              value={funcionarioId}
+              onValueChange={(value) => setValue("FUNCIONARIO_ID", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um funcionário..." />
+              </SelectTrigger>
+              <SelectContent>
+                {employees.map((emp) => (
+                  <SelectItem key={emp.ID} value={emp.ID.toString()}>
+                    {emp.NOME}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.FUNCIONARIO_ID && (
+              <FieldMessage variant="error">
+                {errors.FUNCIONARIO_ID.message}
+              </FieldMessage>
+            )}
+          </Field>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <Field>

@@ -54,6 +54,8 @@ interface RequestFormProps {
   onSubmit: (data: CreateRequestData | UpdateRequestData) => Promise<void>;
   isSubmitting: boolean;
   onCancel: () => void;
+  role?: string;
+  employeeId?: string;
 }
 
 const requestTypes = [
@@ -69,10 +71,15 @@ export function RequestForm({
   onSubmit,
   isSubmitting,
   onCancel,
+  role,
+  employeeId,
 }: RequestFormProps) {
+  const isEmployee = role === "EMPLOYEE";
+
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: () => employeesApi.getAll(),
+    enabled: !isEmployee,
   });
 
   const employees =
@@ -87,7 +94,9 @@ export function RequestForm({
   } = useForm<RequestFormData>({
     resolver: zodResolver(requestSchema),
     defaultValues: {
-      FUNCIONARIO_ID: request?.FUNCIONARIO_ID?.toString() || "",
+      FUNCIONARIO_ID:
+        request?.FUNCIONARIO_ID?.toString() ||
+        (isEmployee ? (employeeId ?? "") : ""),
       TIPO: request?.TIPO || "DOCUMENTO",
       DESCRICAO: request?.DESCRICAO || "",
       DATA_SOLICITACAO:
@@ -123,30 +132,31 @@ export function RequestForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <FieldGroup>
-        <Field>
-          <FieldLabel>Funcionário *</FieldLabel>
-          <Select
-            value={funcionarioId}
-            onValueChange={(value) => setValue("FUNCIONARIO_ID", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um funcionário..." />
-            </SelectTrigger>
-            <SelectContent>
-              {employees.map((emp) => (
-                <SelectItem key={emp.ID} value={emp.ID.toString()}>
-                  {emp.NOME}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.FUNCIONARIO_ID && (
-            <FieldMessage variant="error">
-              {errors.FUNCIONARIO_ID.message}
-            </FieldMessage>
-          )}
-        </Field>
-
+        {!isEmployee && (
+          <Field>
+            <FieldLabel>Funcionário *</FieldLabel>
+            <Select
+              value={funcionarioId}
+              onValueChange={(value) => setValue("FUNCIONARIO_ID", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um funcionário..." />
+              </SelectTrigger>
+              <SelectContent>
+                {employees.map((emp) => (
+                  <SelectItem key={emp.ID} value={emp.ID.toString()}>
+                    {emp.NOME}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.FUNCIONARIO_ID && (
+              <FieldMessage variant="error">
+                {errors.FUNCIONARIO_ID.message}
+              </FieldMessage>
+            )}
+          </Field>
+        )}
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <FieldLabel>Tipo *</FieldLabel>

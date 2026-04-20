@@ -208,6 +208,7 @@ export interface SystemUser {
   ROLE: UserRole;
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
+  FUNCIONARIO_ID?: string;
 }
 
 export interface CreateUserData {
@@ -215,6 +216,7 @@ export interface CreateUserData {
   EMAIL: string;
   SENHA: string;
   ROLE: UserRole;
+  FUNCIONARIO_ID?: string;
 }
 
 export interface UpdateUserData {
@@ -225,6 +227,7 @@ export interface UpdateUserData {
   ROLE?: UserRole;
   SENHA_ATUAL?: string;
   NOVA_SENHA?: string;
+  FUNCIONARIO_ID?: string;
 }
 
 export interface DashboardSummary {

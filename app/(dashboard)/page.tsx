@@ -21,7 +21,14 @@ import {
   Clock,
   UserPlus,
 } from "lucide-react";
-import { dashboardApi, vacationsApi } from "@/lib/api";
+import {
+  vacationsApi,
+  requestsApi,
+  employeesApi,
+  departmentsApi,
+  positionsApi,
+} from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 interface StatCardProps {
   title: string;
   value: number | string;
@@ -207,42 +214,72 @@ function PendingVacationsCard({
 }
 
 export default function DashboardPage() {
-  const { data: summaryData, isLoading: summaryLoading } = useQuery({
-    queryKey: ["dashboard-summary"],
-    queryFn: () => dashboardApi.getSummary(),
-  });
-
-  const { data: activityData, isLoading: activityLoading } = useQuery({
-    queryKey: ["dashboard-activity"],
-    queryFn: () => dashboardApi.getRecentActivity(),
-  });
+  const { user, role } = useAuth();
+  const isEmployee = role === "EMPLOYEE";
 
   const { data: vacationsData, isLoading: vacationsLoading } = useQuery({
     queryKey: ["vacations-pending"],
     queryFn: () => vacationsApi.getAll(),
   });
 
-  const isLoading = summaryLoading || activityLoading;
+  const { data: requestsData, isLoading: requestsLoading } = useQuery({
+    queryKey: ["requests-dashboard"],
+    queryFn: () => requestsApi.getAll(),
+  });
 
-  const summary = summaryData?.data;
-  const activities = activityData?.data ?? [];
-  const pendingVacations = (vacationsData?.data ?? []).filter(
+  const { data: employeesData, isLoading: employeesLoading } = useQuery({
+    queryKey: ["employees"],
+    queryFn: () => employeesApi.getAll(),
+    enabled: !isEmployee,
+  });
+
+  const { data: departmentsData, isLoading: departmentsLoading } = useQuery({
+    queryKey: ["departments"],
+    queryFn: () => departmentsApi.getAll(),
+    enabled: !isEmployee,
+  });
+
+  const { data: positionsData, isLoading: positionsLoading } = useQuery({
+    queryKey: ["positions"],
+    queryFn: () => positionsApi.getAll(),
+    enabled: !isEmployee,
+  });
+
+  const isLoading = isEmployee
+    ? vacationsLoading || requestsLoading
+    : vacationsLoading ||
+      requestsLoading ||
+      employeesLoading ||
+      departmentsLoading ||
+      positionsLoading;
+
+  const allVacations = vacationsData?.data ?? [];
+  const allRequests = requestsData?.data ?? [];
+
+  const myVacations = isEmployee
+    ? allVacations.filter((v) => v.FUNCIONARIO?.ID === user?.FUNCIONARIO_ID)
+    : allVacations;
+
+  const myRequests = isEmployee
+    ? allRequests.filter((r) => r.FUNCIONARIO?.ID === user?.FUNCIONARIO_ID)
+    : allRequests;
+
+  const pendingVacations = myVacations.filter(
     (v) => v.STATUS_FERIAS === "PENDENTE",
   );
+  const openRequests = myRequests.filter((r) => r.STATUS === "PENDENTE");
 
-  const recentActivity: RecentActivityItem[] = activities.map((a) => ({
-    id: a.id,
-    type: a.type,
-    title: a.description,
-    description: new Date(a.timestamp).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    timestamp: a.timestamp,
-  }));
+  const totalEmployees = (employeesData?.data ?? []).filter(
+    (e) => e.STATUS === "ATIVO",
+  ).length;
+  const totalDepartments = (departmentsData?.data ?? []).filter(
+    (d) => d.STATUS === "ATIVO",
+  ).length;
+  const totalPositions = (positionsData?.data ?? []).filter(
+    (p) => p.STATUS === "ATIVO",
+  ).length;
+
+  const recentActivity: RecentActivityItem[] = [];
 
   const pendingVacationsList = pendingVacations.slice(0, 5).map((v) => ({
     name: v.FUNCIONARIO?.NOME || "Funcionário",
@@ -254,41 +291,68 @@ export default function DashboardPage() {
     <div>
       <PageHeader
         title="Dashboard"
-        description="Visão geral do sistema de recursos humanos"
+        description={
+          isEmployee
+            ? "Visão geral das suas solicitações"
+            : "Visão geral do sistema de recursos humanos"
+        }
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-6">
         {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => <StatCardSkeleton key={i} />)
+          Array.from({ length: isEmployee ? 3 : 5 }).map((_, i) => (
+            <StatCardSkeleton key={i} />
+          ))
+        ) : isEmployee ? (
+          <>
+            <StatCard
+              title="Minhas Férias"
+              value={myVacations.length}
+              description="Total de solicitações"
+              icon={<Palmtree className="h-4 w-4" />}
+            />
+            <StatCard
+              title="Férias Pendentes"
+              value={pendingVacations.length}
+              description="Aguardando aprovação"
+              icon={<Clock className="h-4 w-4" />}
+            />
+            <StatCard
+              title="Minhas Solicitações"
+              value={myRequests.length}
+              description="Total de solicitações abertas"
+              icon={<FileText className="h-4 w-4" />}
+            />
+          </>
         ) : (
           <>
             <StatCard
               title="Total Funcionários"
-              value={summary?.totalEmployees ?? 0}
+              value={totalEmployees}
               description="Funcionários ativos"
               icon={<Users className="h-4 w-4" />}
             />
             <StatCard
               title="Departamentos"
-              value={summary?.totalDepartments ?? 0}
+              value={totalDepartments}
               description="Departamentos ativos"
               icon={<Building2 className="h-4 w-4" />}
             />
             <StatCard
               title="Cargos"
-              value={summary?.totalPositions ?? 0}
+              value={totalPositions}
               description="Cargos cadastrados"
               icon={<Briefcase className="h-4 w-4" />}
             />
             <StatCard
               title="Férias Pendentes"
-              value={summary?.pendingVacations ?? 0}
+              value={pendingVacations.length}
               description="Aguardando aprovação"
               icon={<Palmtree className="h-4 w-4" />}
             />
             <StatCard
               title="Solicitações Abertas"
-              value={summary?.openRequests ?? 0}
+              value={openRequests.length}
               description="Sem resposta"
               icon={<FileText className="h-4 w-4" />}
             />
@@ -297,7 +361,12 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <RecentActivityCard activities={recentActivity} isLoading={isLoading} />
+        {!isEmployee && (
+          <RecentActivityCard
+            activities={recentActivity}
+            isLoading={isLoading}
+          />
+        )}
         <PendingVacationsCard
           vacations={pendingVacationsList}
           isLoading={vacationsLoading}

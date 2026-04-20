@@ -25,8 +25,10 @@ import type {
   CreateRequestData,
   UpdateRequestData,
 } from "@/lib/types";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function RequestsPage() {
+  const { user, role } = useAuth();
   const queryClient = useQueryClient();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<
@@ -253,6 +255,8 @@ export default function RequestsPage() {
           onSubmit={handleSubmit}
           isSubmitting={createMutation.isPending || updateMutation.isPending}
           onCancel={() => setIsFormOpen(false)}
+          role={role ?? undefined}
+          employeeId={user?.FUNCIONARIO_ID}
         />
       </FormModal>
 

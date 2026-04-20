@@ -218,7 +218,7 @@ export default function VacationsPage() {
     role !== "EMPLOYEE"
       ? allVacations
       : allVacations.filter(
-          (vacation) => vacation.FUNCIONARIO_ID === user?.FUNCIONARIO_ID,
+          (vacation) => vacation.FUNCIONARIO?.ID === user?.FUNCIONARIO_ID,
         );
 
   return (
@@ -264,6 +264,8 @@ export default function VacationsPage() {
           onSubmit={handleSubmit}
           isSubmitting={createMutation.isPending || updateMutation.isPending}
           onCancel={() => setIsFormOpen(false)}
+          role={role ?? undefined}
+          employeeId={user?.FUNCIONARIO_ID}
         />
       </FormModal>
 
