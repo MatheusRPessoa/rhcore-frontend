@@ -211,7 +211,10 @@ export default function RequestsPage() {
       },
     },
   ];
-
+  const visibleColumns =
+    role === "EMPLOYEE"
+      ? columns.filter((col) => col.id !== "actions")
+      : columns;
   const requests = data?.data || [];
 
   return (
@@ -233,7 +236,7 @@ export default function RequestsPage() {
         </div>
       ) : (
         <DataTable
-          columns={columns}
+          columns={visibleColumns}
           data={requests}
           searchKey="FUNCIONARIO"
           searchPlaceholder="Buscar por funcionário..."

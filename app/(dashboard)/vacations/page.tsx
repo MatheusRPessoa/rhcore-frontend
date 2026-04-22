@@ -212,6 +212,10 @@ export default function VacationsPage() {
       },
     },
   ];
+  const visibleColumns =
+    role === "EMPLOYEE"
+      ? columns.filter((col) => col.id !== "actions")
+      : columns;
 
   const allVacations = data?.data || [];
   const vacations =
@@ -240,7 +244,7 @@ export default function VacationsPage() {
         </div>
       ) : (
         <DataTable
-          columns={columns}
+          columns={visibleColumns}
           data={vacations}
           searchKey="FUNCIONARIO"
           searchPlaceholder="Buscar por funcionário..."
