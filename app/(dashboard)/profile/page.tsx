@@ -76,7 +76,7 @@ export default function ProfilePage() {
 
   if (!user) return null;
 
-  const initials = (user.USERNAME ?? "US").slice(0, 2).toUpperCase();
+  const initials = (user.NOME_USUARIO ?? "US").slice(0, 2).toUpperCase();
 
   return (
     <div className="flex flex-col gap-6">
@@ -93,7 +93,7 @@ export default function ProfilePage() {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-1">
-            <CardTitle>{user.USERNAME}</CardTitle>
+            <CardTitle>{user.NOME_USUARIO}</CardTitle>
             <Badge variant="outline">
               {ROLE_LABELS[user.ROLE] || user.ROLE}
             </Badge>
@@ -106,7 +106,10 @@ export default function ProfilePage() {
             <dd className="font-mono text-xs break-all">{user.ID}</dd>
 
             <dt className="text-muted-foreground font-medium">Usuário</dt>
-            <dd>{user.USERNAME}</dd>
+            <dd>{user.NOME_USUARIO}</dd>
+
+            <dt className="text-muted-foreground font-medium">Email</dt>
+            <dd>{user.EMAIL}</dd>
 
             <dt className="text-muted-foreground font-medium">Perfil</dt>
             <dd>{ROLE_LABELS[user.ROLE] || user.ROLE}</dd>

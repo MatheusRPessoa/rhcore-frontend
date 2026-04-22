@@ -19,8 +19,8 @@ export function TopBar() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const initials = user?.USERNAME
-    ? user.USERNAME.slice(0, 2).toUpperCase()
+  const initials = user?.NOME_USUARIO
+    ? user.NOME_USUARIO.slice(0, 2).toUpperCase()
     : "US";
 
   return (
@@ -43,7 +43,7 @@ export function TopBar() {
           <DropdownMenuContent className="w-56" align="end">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
-                <p className="text-sm font-medium">{user?.USERNAME}</p>
+                <p className="text-sm font-medium">{user?.NOME_USUARIO}</p>
                 <p className="text-xs text-muted-foreground">Administrador</p>
               </div>
             </DropdownMenuLabel>
