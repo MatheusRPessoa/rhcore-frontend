@@ -26,7 +26,8 @@ export interface AuthTokens {
 
 export interface User {
   ID: string;
-  USERNAME: string;
+  NOME_USUARIO: string;
+  EMAIL: string;
   STATUS: "ATIVO" | "INATIVO";
   ROLE: UserRole;
   CRIADO_EM: string;
