@@ -216,13 +216,7 @@ export default function RequestsPage() {
       },
     },
   ];
-  const allRequests = data?.data || [];
-  const requests =
-    role !== "EMPLOYEE" || hasAppPermission("APPROVE_REQUESTS")
-      ? allRequests
-      : allRequests.filter(
-          (request) => request.FUNCIONARIO?.ID === user?.FUNCIONARIO_ID,
-        );
+  const requests = data?.data || [];
 
   const visibleColumns = hasAppPermission("APPROVE_REQUESTS")
     ? columns
