@@ -9,6 +9,7 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   "/requests": ["ADMIN", "MANAGER", "EMPLOYEE"],
   "/users": ["ADMIN"],
   "/profile": ["ADMIN", "MANAGER", "EMPLOYEE"],
+  "/reports": ["ADMIN", "MANAGER", "EMPLOYEE"],
 };
 
 export function hasRouteAccess(

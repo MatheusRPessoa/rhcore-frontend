@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     ) {
       router.push("/login");
     }
-  }, [isAuthenticated, isLoading, router, role, pathname]);
+  }, [isAuthenticated, isLoading, router, role, pathname, user]);
 
   if (isLoading) {
     return (

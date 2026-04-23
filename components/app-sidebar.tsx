@@ -12,6 +12,7 @@ import {
   Palmtree,
   FileText,
   UserCog,
+  BarChart2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -51,6 +52,13 @@ const mainNavItems = [
     url: "/positions",
     icon: Briefcase,
     roles: ["ADMIN", "MANAGER"] as UserRole[],
+  },
+  {
+    title: "Relatórios",
+    url: "/reports",
+    icon: BarChart2,
+    roles: [] as UserRole[],
+    permission: "VIEW_REPORTS",
   },
 ];
 
