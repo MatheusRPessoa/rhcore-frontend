@@ -220,13 +220,7 @@ export default function VacationsPage() {
     ? columns
     : columns.filter((col) => col.id !== "actions");
 
-  const allVacations = data?.data || [];
-  const vacations =
-    role !== "EMPLOYEE" || hasAppPermission("VIEW_ALL_EMPLOYEES")
-      ? allVacations
-      : allVacations.filter(
-          (vacation) => vacation.FUNCIONARIO?.ID === user?.FUNCIONARIO_ID,
-        );
+  const vacations = data?.data || [];
 
   return (
     <div>
