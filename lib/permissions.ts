@@ -14,6 +14,7 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
 export function hasRouteAccess(
   role: UserRole | null,
   pathname: string,
+  permissions?: string[],
 ): boolean {
   if (!role) return false;
   const match = Object.keys(ROUTE_PERMISSIONS)
@@ -22,5 +23,8 @@ export function hasRouteAccess(
     )
     .sort((a, b) => b.length - a.length)[0];
   if (!match) return true;
-  return ROUTE_PERMISSIONS[match].includes(role);
+  if (ROUTE_PERMISSIONS[match].includes(role)) return true;
+  if (match === "/employees" && permissions?.includes("VIEW_ALL_EMPLOYEES"))
+    return true;
+  return false;
 }

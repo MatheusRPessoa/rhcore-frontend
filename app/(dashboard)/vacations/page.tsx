@@ -222,7 +222,7 @@ export default function VacationsPage() {
 
   const allVacations = data?.data || [];
   const vacations =
-    role !== "EMPLOYEE"
+    role !== "EMPLOYEE" || hasAppPermission("VIEW_ALL_EMPLOYEES")
       ? allVacations
       : allVacations.filter(
           (vacation) => vacation.FUNCIONARIO?.ID === user?.FUNCIONARIO_ID,

@@ -10,12 +10,16 @@ import { Spinner } from "@/components/ui/spinner";
 import { hasRouteAccess } from "@/lib/permissions";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading, role } = useAuth();
+  const { isAuthenticated, isLoading, role, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !hasRouteAccess(role, pathname)) {
+    if (
+      !isLoading &&
+      !isAuthenticated &&
+      !hasRouteAccess(role, pathname, user?.PERMISSIONS)
+    ) {
       router.push("/login");
     }
   }, [isAuthenticated, isLoading, router, role, pathname]);

@@ -27,7 +27,17 @@ import type {
   UpdateUserData,
   UserRole,
   Employee,
+  AppPermission,
 } from "@/lib/types";
+import { Checkbox } from "../ui/checkbox";
+
+const ALL_PERMISSIONS: { value: AppPermission; label: string }[] = [
+  { value: "APPROVE_VACATIONS", label: "Aprovar férias" },
+  { value: "APPROVE_REQUESTS", label: "Aprovar solicitações" },
+  { value: "VIEW_ALL_EMPLOYEES", label: "Ver todos os funcionários" },
+  { value: "MANAGE_PAYROLL", label: "Gerenciar folha de pagamento" },
+  { value: "VIEW_REPORTS", label: "Ver relatórios" },
+];
 
 const userSchema = z.object({
   NOME_USUARIO: z.string().min(1, "O Nome do usuário é obrigatório"),
@@ -39,6 +49,7 @@ const userSchema = z.object({
   STATUS: z.enum(["ATIVO", "INATIVO"]).optional(),
   ROLE: z.enum(["ADMIN", "MANAGER", "EMPLOYEE"]),
   FUNCIONARIO_ID: z.string().optional(),
+  PERMISSIONS: z.array(z.string()).optional(),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -82,12 +93,14 @@ export function UserForm({
       STATUS: user?.STATUS || "ATIVO",
       ROLE: user?.ROLE || "EMPLOYEE",
       FUNCIONARIO_ID: user?.FUNCIONARIO_ID || "",
+      PERMISSIONS: user?.PERMISSIONS || [],
     },
   });
 
   const status = useWatch({ control, name: "STATUS" });
   const role = useWatch({ control, name: "ROLE" });
   const funcionarioId = useWatch({ control, name: "FUNCIONARIO_ID" });
+  const permissions = useWatch({ control, name: "PERMISSIONS" }) ?? [];
 
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
@@ -103,6 +116,7 @@ export function UserForm({
         STATUS: formValues.STATUS,
         ROLE: formValues.ROLE,
         FUNCIONARIO_ID: formValues.FUNCIONARIO_ID,
+        PERMISSIONS: formValues.PERMISSIONS as AppPermission[],
       };
       if (formValues.SENHA) {
         payload.SENHA = formValues.SENHA;
@@ -114,6 +128,7 @@ export function UserForm({
         SENHA: formValues.SENHA!,
         ROLE: formValues.ROLE,
         FUNCIONARIO_ID: formValues.FUNCIONARIO_ID,
+        PERMISSIONS: formValues.PERMISSIONS as AppPermission[],
       });
     }
   };
@@ -201,6 +216,33 @@ export function UserForm({
             </SelectContent>
           </Select>
         </Field>
+
+        {role !== "ADMIN" && (
+          <Field>
+            <FieldLabel>Permissões adicionais</FieldLabel>
+            <div className="flex flex-col gap-2 mt-1">
+              {ALL_PERMISSIONS.map((perm) => (
+                <label
+                  key={perm.value}
+                  className="flex items-center gap-2 text-sm cursor-pointer"
+                >
+                  <Checkbox
+                    checked={permissions.includes(perm.value)}
+                    onCheckedChange={(checked) => {
+                      setValue(
+                        "PERMISSIONS",
+                        checked
+                          ? [...permissions, perm.value]
+                          : permissions.filter((p) => p !== perm.value),
+                      );
+                    }}
+                  />
+                  {perm.label}
+                </label>
+              ))}
+            </div>
+          </Field>
+        )}
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
