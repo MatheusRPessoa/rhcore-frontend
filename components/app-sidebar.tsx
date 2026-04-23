@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import type { UserRole } from "@/lib/types";
+import type { AppPermission, UserRole } from "@/lib/types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -38,6 +38,7 @@ const mainNavItems = [
     url: "/employees",
     icon: Users,
     roles: ["ADMIN", "MANAGER"] as UserRole[],
+    permission: "VIEW_ALL_EMPLOYEES",
   },
   {
     title: "Departamentos",
@@ -79,10 +80,16 @@ const adminNavItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { role } = useAuth();
+  const { role, hasAppPermission } = useAuth();
 
-  const filterByRole = <T extends { roles: UserRole[] }>(items: T[]) =>
-    items.filter((item) => role && item.roles.includes(role));
+  const filterByRole = <T extends { roles: UserRole[]; permission?: string }>(
+    items: T[],
+  ) =>
+    items.filter(
+      (item) =>
+        (role && item.roles.includes(role)) ||
+        (item.permission && hasAppPermission(item.permission as AppPermission)),
+    );
 
   const isActive = (url: string) => {
     if (url === "/") {

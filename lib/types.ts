@@ -215,6 +215,7 @@ export interface SystemUser {
   EMAIL: string;
   STATUS: "ATIVO" | "INATIVO";
   ROLE: UserRole;
+  PERMISSIONS: AppPermission[];
   CRIADO_EM: string;
   ATUALIZADO_POR?: string | null;
   FUNCIONARIO_ID?: string;
@@ -225,6 +226,7 @@ export interface CreateUserData {
   EMAIL: string;
   SENHA: string;
   ROLE: UserRole;
+  PERMISSIONS: AppPermission[];
   FUNCIONARIO_ID?: string;
 }
 
@@ -234,6 +236,7 @@ export interface UpdateUserData {
   SENHA?: string;
   STATUS?: "ATIVO" | "INATIVO";
   ROLE?: UserRole;
+  PERMISSIONS?: AppPermission[];
   SENHA_ATUAL?: string;
   NOVA_SENHA?: string;
   FUNCIONARIO_ID?: string;
