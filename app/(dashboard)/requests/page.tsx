@@ -56,8 +56,8 @@ export default function RequestsPage() {
       setIsFormOpen(false);
       toast.success("Solicitação criada com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao criar solicitação");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao criar solicitação");
     },
   });
 
@@ -70,8 +70,8 @@ export default function RequestsPage() {
       setSelectedRequest(undefined);
       toast.success("Solicitação atualizada com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar solicitação");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao atualizar solicitação");
     },
   });
 
@@ -83,8 +83,8 @@ export default function RequestsPage() {
       setRequestToDelete(null);
       toast.success("Solicitação excluída com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao excluir solicitação");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao excluir solicitação");
     },
   });
 
@@ -96,21 +96,25 @@ export default function RequestsPage() {
       setRequestToApprove(null);
       toast.success("Solicitação aprovada com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao aprovar solicitação");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao aprovar solicitação");
     },
   });
 
   const handleSubmit = async (
     formData: CreateRequestData | UpdateRequestData,
   ) => {
-    if (selectedRequest) {
-      await updateMutation.mutateAsync({
-        id: selectedRequest.ID,
-        data: formData,
-      });
-    } else {
-      await createMutation.mutateAsync(formData as CreateRequestData);
+    try {
+      if (selectedRequest) {
+        await updateMutation.mutateAsync({
+          id: selectedRequest.ID,
+          data: formData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData as CreateRequestData);
+      }
+    } catch {
+      // tratado pelo onError da mutation
     }
   };
 

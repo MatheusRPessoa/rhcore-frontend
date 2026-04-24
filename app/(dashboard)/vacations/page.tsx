@@ -62,8 +62,8 @@ export default function VacationsPage() {
       setIsFormOpen(false);
       toast.success("Férias registradas com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao registrar férias");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao registrar férias");
     },
   });
 
@@ -76,8 +76,8 @@ export default function VacationsPage() {
       setSelectedVacation(undefined);
       toast.success("Férias atualizadas com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar férias");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao atualizar férias");
     },
   });
 
@@ -89,8 +89,8 @@ export default function VacationsPage() {
       setVacationToDelete(null);
       toast.success("Férias excluídas com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao excluir férias");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao excluir férias");
     },
   });
 
@@ -103,21 +103,25 @@ export default function VacationsPage() {
       setVacationToApprove(null);
       toast.success("Férias aprovadas com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao aprovar férias");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao aprovar férias");
     },
   });
 
   const handleSubmit = async (
     formData: CreateVacationData | UpdateVacationData,
   ) => {
-    if (selectedVacation) {
-      await updateMutation.mutateAsync({
-        id: selectedVacation.ID,
-        data: formData,
-      });
-    } else {
-      await createMutation.mutateAsync(formData as CreateVacationData);
+    try {
+      if (selectedVacation) {
+        await updateMutation.mutateAsync({
+          id: selectedVacation.ID,
+          data: formData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData as CreateVacationData);
+      }
+    } catch {
+      // tratado pelo onError da mutation
     }
   };
 
