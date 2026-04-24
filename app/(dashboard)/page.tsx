@@ -27,6 +27,7 @@ import {
   employeesApi,
   departmentsApi,
   positionsApi,
+  dashboardApi,
 } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 interface StatCardProps {
@@ -245,13 +246,20 @@ export default function DashboardPage() {
     enabled: !isEmployee,
   });
 
+  const { data: activityData, isLoading: activityLoading } = useQuery({
+    queryKey: ["dashboard-activity"],
+    queryFn: () => dashboardApi.getRecentActivity(),
+    enabled: !isEmployee,
+  });
+
   const isLoading = isEmployee
     ? vacationsLoading || requestsLoading
     : vacationsLoading ||
       requestsLoading ||
       employeesLoading ||
       departmentsLoading ||
-      positionsLoading;
+      positionsLoading ||
+      activityLoading;
 
   const allVacations = vacationsData?.data ?? [];
   const allRequests = requestsData?.data ?? [];
@@ -279,7 +287,15 @@ export default function DashboardPage() {
     (p) => p.STATUS === "ATIVO",
   ).length;
 
-  const recentActivity: RecentActivityItem[] = [];
+  const recentActivity: RecentActivityItem[] = (activityData?.data ?? []).map(
+    (item) => ({
+      id: item.id,
+      type: item.type,
+      title: item.description,
+      description: "",
+      timestamp: new Date(item.timestamp).toLocaleString("pt-BR"),
+    }),
+  );
 
   const pendingVacationsList = pendingVacations.slice(0, 5).map((v) => ({
     name: v.FUNCIONARIO?.NOME || "Funcionário",

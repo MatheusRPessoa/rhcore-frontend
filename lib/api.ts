@@ -89,7 +89,6 @@ async function apiRequest<T>(
     headers,
   });
 
-  // Handle 401 - try to refresh token
   if (response.status === 401 && refreshToken) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
@@ -106,7 +105,10 @@ async function apiRequest<T>(
     const body = await response.json().catch(() => null);
     throw {
       statusCode: body?.error?.statusCode ?? response.status,
-      message: body?.message ?? "Erro de conexão com o servidor",
+      message:
+        body?.error?.message ??
+        body?.message ??
+        "Erro de conexão com o servidor",
       error: body?.error?.error ?? "NetworkError",
     };
   }
@@ -114,7 +116,6 @@ async function apiRequest<T>(
   return response.json();
 }
 
-// Auth API
 export const authApi = {
   login: async (
     credentials: LoginCredentials,
@@ -181,7 +182,6 @@ export const authApi = {
   },
 };
 
-// Employees API
 export const employeesApi = {
   getAll: async (): Promise<ApiResponse<Employee[]>> => {
     return apiRequest<ApiResponse<Employee[]>>("/employees");
@@ -215,7 +215,6 @@ export const employeesApi = {
   },
 };
 
-// Departments API
 export const departmentsApi = {
   getAll: async (): Promise<ApiResponse<Department[]>> => {
     return apiRequest<ApiResponse<Department[]>>("/departments");
@@ -251,7 +250,6 @@ export const departmentsApi = {
   },
 };
 
-// Positions API
 export const positionsApi = {
   getAll: async (): Promise<ApiResponse<Position[]>> => {
     return apiRequest<ApiResponse<Position[]>>("/positions");
@@ -285,7 +283,6 @@ export const positionsApi = {
   },
 };
 
-// Vacations API
 export const vacationsApi = {
   getAll: async (): Promise<ApiResponse<Vacation[]>> => {
     return apiRequest<ApiResponse<Vacation[]>>("/vacations");
@@ -319,7 +316,6 @@ export const vacationsApi = {
   },
 };
 
-// Requests API
 export const requestsApi = {
   getAll: async (): Promise<ApiResponse<HRRequest[]>> => {
     return apiRequest<ApiResponse<HRRequest[]>>("/requests");
@@ -359,7 +355,6 @@ export const requestsApi = {
   },
 };
 
-// Users API
 export const usersApi = {
   getAll: async (): Promise<ApiResponse<SystemUser[]>> => {
     return apiRequest<ApiResponse<SystemUser[]>>("/users");
@@ -393,7 +388,6 @@ export const usersApi = {
   },
 };
 
-// Dashboard API
 export const dashboardApi = {
   getSummary: async (): Promise<ApiResponse<DashboardSummary>> => {
     return apiRequest<ApiResponse<DashboardSummary>>("/dashboard/summary");

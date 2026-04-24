@@ -155,6 +155,11 @@ export default function RequestsPage() {
       ),
     },
     {
+      accessorKey: "STATUS",
+      header: "Status",
+      cell: ({ row }) => <StatusBadge status={row.original.STATUS} />,
+    },
+    {
       accessorKey: "DATA_SOLICITACAO",
       header: "Data Solicitação",
       cell: ({ row }) =>

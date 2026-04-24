@@ -51,8 +51,8 @@ export default function EmployeesPage() {
       setIsFormOpen(false);
       toast.success("Funcionário criado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao criar funcionário");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao criar funcionário");
     },
   });
 
@@ -65,8 +65,8 @@ export default function EmployeesPage() {
       setSelectedEmployee(undefined);
       toast.success("Funcionário atualizado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar funcionário");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao atualizar funcionário");
     },
   });
 
@@ -78,21 +78,25 @@ export default function EmployeesPage() {
       setEmployeeToDelete(null);
       toast.success("Funcionário excluído com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao excluir funcionário");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao excluir funcionário");
     },
   });
 
   const handleSubmit = async (
     formData: CreateEmployeeData | UpdateEmployeeData,
   ) => {
-    if (selectedEmployee) {
-      await updateMutation.mutateAsync({
-        id: selectedEmployee.ID,
-        data: formData,
-      });
-    } else {
-      await createMutation.mutateAsync(formData as CreateEmployeeData);
+    try {
+      if (selectedEmployee) {
+        await updateMutation.mutateAsync({
+          id: selectedEmployee.ID,
+          data: formData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData as CreateEmployeeData);
+      }
+    } catch {
+      // tratado pelo onError da mutation
     }
   };
 
