@@ -41,8 +41,8 @@ export default function UsersPage() {
       setIsFormOpen(false);
       toast.success("Usuário criado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao criar usuário");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao criar usuário");
     },
   });
 
@@ -55,8 +55,8 @@ export default function UsersPage() {
       setSelectedUser(undefined);
       toast.success("Usuário atualizado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar usuário");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao atualizar usuário");
     },
   });
 
@@ -68,19 +68,23 @@ export default function UsersPage() {
       setUserToDelete(null);
       toast.success("Usuário excluído com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao excluir usuário");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao excluir usuário");
     },
   });
 
   const handleSubmit = async (formData: CreateUserData | UpdateUserData) => {
-    if (selectedUser) {
-      await updateMutation.mutateAsync({
-        id: selectedUser.ID,
-        data: formData as UpdateUserData,
-      });
-    } else {
-      await createMutation.mutateAsync(formData as CreateUserData);
+    try {
+      if (selectedUser) {
+        await updateMutation.mutateAsync({
+          id: selectedUser.ID,
+          data: formData as UpdateUserData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData as CreateUserData);
+      }
+    } catch {
+      // tratado pelo onError da mutation
     }
   };
 

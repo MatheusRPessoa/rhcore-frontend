@@ -48,8 +48,8 @@ export default function DepartmentsPage() {
       setIsFormOpen(false);
       toast.success("Departamento criado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao criar departamento");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao criar departamento");
     },
   });
 
@@ -62,8 +62,8 @@ export default function DepartmentsPage() {
       setSelectedDepartment(undefined);
       toast.success("Departamento atualizado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar departamento");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao atualizar departamento");
     },
   });
 
@@ -75,21 +75,25 @@ export default function DepartmentsPage() {
       setDepartmentToDelete(null);
       toast.success("Departamento excluído com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao excluir departamento");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao excluir departamento");
     },
   });
 
   const handleSubmit = async (
     formData: CreateDepartmentData | UpdateDepartmentData,
   ) => {
-    if (selectedDepartment) {
-      await updateMutation.mutateAsync({
-        id: selectedDepartment.ID,
-        data: formData,
-      });
-    } else {
-      await createMutation.mutateAsync(formData as CreateDepartmentData);
+    try {
+      if (selectedDepartment) {
+        await updateMutation.mutateAsync({
+          id: selectedDepartment.ID,
+          data: formData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData as CreateDepartmentData);
+      }
+    } catch {
+      // tratado pelo onError da mutation
     }
   };
 

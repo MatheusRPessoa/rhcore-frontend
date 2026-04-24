@@ -49,8 +49,8 @@ export default function PositionsPage() {
       setIsFormOpen(false);
       toast.success("Cargo criado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao criar cargo");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao criar cargo");
     },
   });
 
@@ -63,8 +63,8 @@ export default function PositionsPage() {
       setSelectedPosition(undefined);
       toast.success("Cargo atualizado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar cargo");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao atualizar cargo");
     },
   });
 
@@ -76,21 +76,25 @@ export default function PositionsPage() {
       setPositionToDelete(null);
       toast.success("Cargo excluído com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao excluir cargo");
+    onError: (error: { message?: string }) => {
+      toast.error(error.message ?? "Erro ao excluir cargo");
     },
   });
 
   const handleSubmit = async (
     formData: CreatePositionData | UpdatePositionData,
   ) => {
-    if (selectedPosition) {
-      await updateMutation.mutateAsync({
-        id: selectedPosition.ID,
-        data: formData,
-      });
-    } else {
-      await createMutation.mutateAsync(formData as CreatePositionData);
+    try {
+      if (selectedPosition) {
+        await updateMutation.mutateAsync({
+          id: selectedPosition.ID,
+          data: formData,
+        });
+      } else {
+        await createMutation.mutateAsync(formData as CreatePositionData);
+      }
+    } catch {
+      // tratado pelo onError da mutation
     }
   };
 
