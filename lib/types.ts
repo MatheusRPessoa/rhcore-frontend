@@ -256,3 +256,45 @@ export interface RecentActivity {
   description: string;
   timestamp: string;
 }
+
+export type PayrollStatus = "PENDENTE" | "PROCESSADO" | "PAGO";
+
+export interface Payroll {
+  ID: string;
+  FUNCIONARIO_ID: string;
+  FUNCIONARIO: {
+    ID: string;
+    NOME: string;
+    MATRICULA: string;
+  };
+  MES_REFERENCIA: number;
+  ANO_REFERENCIA: number;
+  NUMERO_DEPENDENTES: number;
+  SALARIO_BASE: string;
+  BONUS: string;
+  DESCONTO_INSS: string;
+  DESCONTO_IRRF: string;
+  OUTROS_DESCONTOS: string;
+  SALARIO_LIQUIDO: string;
+  STATUS_FOLHA: PayrollStatus;
+  OBSERVACAO: string | null;
+  CRIADO_POR: string;
+  CRIADO_EM: string;
+}
+
+export interface CreatePayrollData {
+  FUNCIONARIO_ID: string;
+  MES_REFERENCIA: number;
+  ANO_REFERENCIA: number;
+  NUMERO_DEPENDENTES?: number;
+  SALARIO_BASE: number;
+  BONUS?: number;
+  DESCONTO_INSS?: number;
+  DESCONTO_IRRF?: number;
+  OUTROS_DESCONTOS?: number;
+  OBSERVACAO?: string;
+}
+
+export interface UpdatePayrollData extends Partial<CreatePayrollData> {
+  STATUS_FOLHA?: PayrollStatus;
+}

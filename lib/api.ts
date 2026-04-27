@@ -23,6 +23,9 @@ import type {
   DashboardSummary,
   RecentActivity,
   LoginCredentials,
+  Payroll,
+  CreatePayrollData,
+  UpdatePayrollData,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
@@ -395,5 +398,64 @@ export const dashboardApi = {
 
   getRecentActivity: async (): Promise<ApiResponse<RecentActivity[]>> => {
     return apiRequest<ApiResponse<RecentActivity[]>>("/dashboard/activity");
+  },
+};
+
+export const payrollApi = {
+  getAll: async (): Promise<ApiResponse<Payroll[]>> => {
+    return apiRequest<ApiResponse<Payroll[]>>("/payroll");
+  },
+
+  getById: async (id: string): Promise<ApiResponse<Payroll>> => {
+    return apiRequest<ApiResponse<Payroll>>(`/payroll/${id}`);
+  },
+
+  create: async (data: CreatePayrollData): Promise<ApiResponse<Payroll>> => {
+    return apiRequest<ApiResponse<Payroll>>("/payroll", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: async (
+    id: string,
+    data: UpdatePayrollData,
+  ): Promise<ApiResponse<Payroll>> => {
+    return apiRequest<ApiResponse<Payroll>>(`/payroll/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  pay: async (id: string): Promise<ApiResponse<Payroll>> => {
+    return apiRequest<ApiResponse<Payroll>>(`/payroll/${id}/pay`, {
+      method: "PATCH",
+    });
+  },
+
+  delete: async (id: string): Promise<ApiResponse<void>> => {
+    return apiRequest<ApiResponse<void>>(`/payroll/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  slip: async (id: string): Promise<void> => {
+    const token = getAccessToken();
+    const response = await fetch(`${API_URL}/payroll/${id}/slip`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => null);
+      throw {
+        statusCode: body?.error?.statusCode ?? response.status,
+        message:
+          body?.error?.message ?? body?.message ?? "Erro ao gerar holerite",
+        error: body?.error?.error ?? "NetworkError",
+      };
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   },
 };
