@@ -7,6 +7,7 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   "/positions": ["ADMIN", "MANAGER", "EMPLOYEE"],
   "/vacations": ["ADMIN", "MANAGER", "EMPLOYEE"],
   "/requests": ["ADMIN", "MANAGER", "EMPLOYEE"],
+  "/payroll": ["ADMIN", "MANAGER"],
   "/users": ["ADMIN"],
   "/profile": ["ADMIN", "MANAGER", "EMPLOYEE"],
   "/reports": ["ADMIN", "MANAGER", "EMPLOYEE"],

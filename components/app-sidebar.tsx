@@ -13,6 +13,7 @@ import {
   FileText,
   UserCog,
   BarChart2,
+  DollarSign,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,7 +27,6 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-
 const mainNavItems = [
   {
     title: "Dashboard",
@@ -59,6 +59,13 @@ const mainNavItems = [
     icon: BarChart2,
     roles: [] as UserRole[],
     permission: "VIEW_REPORTS",
+  },
+  {
+    title: "Folha de Pagamento",
+    url: "/payroll",
+    icon: DollarSign,
+    roles: [] as UserRole[],
+    permission: "MANAGE_PAYROLL",
   },
 ];
 
